@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI';
+}
+.calendar-block {
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+.calendar-control {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.calendar-control h1 {
+    margin: 0;
+}
+.calendar-control div {
+    height: fit-content;
+    display: flex;
+    flex-direction: inherit;
+    align-items: center;
+}
+.calendar-control #previous-month, .calendar-control #next-month {
+    cursor: pointer;
+    margin: 0 15px;
+    user-select: none;
+}
+
+#refresh {
+    cursor: pointer;
+    user-select: none;
+}
