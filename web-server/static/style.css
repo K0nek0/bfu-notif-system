@@ -1,5 +1,6 @@
 :root {
-    --accent-color: rgb(0,166,255)
+    --accent-color: rgb(0,166,255);
+    --accent-color-hover: rgb(74,192,255)
 }
 
 body {
@@ -129,4 +130,11 @@ body {
 }
 .calendar-cell.inactive:hover {
     cursor: default;
+}
+.calendar-cell.current-date {
+    background: var(--accent-color);
+    color: white;
+}
+.calendar-cell.current-date:hover {
+    background: var(--accent-color-hover);
 }
