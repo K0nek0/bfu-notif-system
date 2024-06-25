@@ -22,6 +22,7 @@ body {
 }
 .calendar-control h1 {
     margin: 0;
+    user-select: none;
 }
 .calendar-control div {
     height: fit-content;
