@@ -25,12 +25,18 @@ body {
     align-items: center;
 }
 .calendar-control #previous-month, .calendar-control #next-month {
-    cursor: pointer;
-    margin: 0 15px;
+    margin: 0 5px;
+    margin-top: 5px;
+    font-size: 32px;
+}
+.calendar-control span {
+    color: #9a9a9a;
     user-select: none;
 }
-
-#refresh {
+.calendar-control span:hover {
+    color: black;
     cursor: pointer;
-    user-select: none;
+}
+#refresh {
+    font-size: 32px;
 }
