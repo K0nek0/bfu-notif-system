@@ -71,6 +71,29 @@ document.addEventListener("DOMContentLoaded", event => {
         }
     }
 
+    function outOfMonthsBounds(month, checkPrevious) {
+        if(checkPrevious) return month - 1 < 0
+        else return month + 1 >= 12
+    }
+    document.getElementById("previous-month").addEventListener("click", () => {
+        let monthBack = currentCalendar.month
+        let yearBack = currentCalendar.year
+        if(outOfMonthsBounds(monthBack, true)) {
+            monthBack = 11
+            yearBack--
+        } else monthBack--
+        updateCalendar(monthBack, yearBack)
+    })
+    document.getElementById("next-month").addEventListener("click", () => {
+        let monthFurther = currentCalendar.month
+        let yearFurther = currentCalendar.year
+        if(outOfMonthsBounds(monthFurther, false)) {
+            monthFurther = 0
+            yearFurther++
+        } else monthFurther++
+        updateCalendar(monthFurther, yearFurther)
+    })
+    
     let now = new Date()
     updateCalendar(now.getMonth(), now.getFullYear())
     console.log("Calendar script loaded")
