@@ -1,3 +1,7 @@
+:root {
+    --accent-color: rgb(0,166,255)
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -47,4 +51,82 @@ body {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.calendar-container {
+    margin: 0 5px;
+    margin-top: 25px;
+}
+
+.calendar-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    user-select: none;
+}
+.calendar-header div {
+    flex: 0 1 calc(100%/7 - 5px);
+    font-size: max(1.1vw, 16px);
+    text-transform: uppercase;
+    text-align: center;
+}
+
+#calendar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 5px;
+    padding-right: 0;
+    gap: 5px;
+    border-radius: 5px;
+}
+.calendar-cell {
+    flex-basis: calc(100%/7 - 5px);
+    background: white;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-radius: 5px;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,.05));
+    user-select: none;
+}
+.calendar-cell:hover {
+    background: #fafafa;
+    cursor: pointer;
+}
+.calendar-cell .date-number {
+    margin-left: 10%;
+    margin-right: auto;
+    font-size: 1.3cm;
+    font-weight: 500;
+}
+.calendar-cell .description {
+    font-size: .4cm;
+    color: white;
+    background: var(--accent-color);
+    aspect-ratio: 1;
+    text-align: center;
+    border-radius: 100px;
+    margin: 5px;
+}
+@media screen and (max-width: 650px) {
+    .calendar-cell .date-number {
+        font-size: max(20px, 2.5vw);
+    }
+    .calendar-cell .description {
+        font-size: max(10px, .8vw);
+    }
+}
+.calendar-cell .description:empty {
+    display: none;
+}
+.calendar-cell.inactive {
+    background: transparent;
+    opacity: .2;
+}
+.calendar-cell.inactive:hover {
+    cursor: default;
 }
