@@ -31,7 +31,9 @@ document.addEventListener("DOMContentLoaded", event => {
         
         let millisecondsInDay = 24 * 60 * 60 * 1000
         let cellIndex = 0
-        for(cellIndex; cellIndex < monthStart.getDay() - 1; cellIndex++) {
+        let monthStartDay = monthStart.getDay() - 1
+        if(monthStartDay == -1) monthStartDay = 6
+        for(cellIndex; cellIndex < monthStartDay; cellIndex++) {
             let cell = calendar.children.item(cellIndex)
             let offsetDayTimestamp = monthStart.getTime() - millisecondsInDay * (monthStart.getDay() - cellIndex - 1)
             let offsetedDay = new Date(offsetDayTimestamp)
@@ -44,12 +46,12 @@ document.addEventListener("DOMContentLoaded", event => {
         let monthEnded = false
         while(!monthEnded) {
             let cell = calendar.children.item(cellIndex)
-            cellIndex++
             let monthDate = new Date(monthStart.getTime() + millisecondsInDay * (monthDay - 1))
             if(monthDate.getMonth() != monthStart.getMonth()) {
                 monthEnded = true
                 continue
             }
+            cellIndex++
             if(cell.classList.contains("inactive")) cell.classList.remove("inactive")
             if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
             if(monthDate.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
