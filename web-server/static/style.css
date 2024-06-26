@@ -105,7 +105,7 @@ body {
     font-weight: 500;
 }
 .calendar-cell .description {
-    font-size: .4cm;
+    font-size: .5cm;
     color: white;
     background: var(--accent-color);
     aspect-ratio: 1;

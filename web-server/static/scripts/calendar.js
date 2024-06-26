@@ -93,6 +93,11 @@ document.addEventListener("DOMContentLoaded", event => {
         } else monthFurther++
         updateCalendar(monthFurther, yearFurther)
     })
+    document.getElementById("home-month").addEventListener("click", () => {
+        let currentDate = new Date()
+        if(currentCalendar.month == currentDate.getMonth() && currentCalendar.year == currentDate.getFullYear()) return
+        updateCalendar(currentDate.getMonth(), currentDate.getFullYear())
+    })
 
     function buildCalendarLayout() {
         calendar.innerHTML = ""
