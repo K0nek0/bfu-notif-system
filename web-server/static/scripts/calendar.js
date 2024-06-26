@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", event => {
             cell.append(dateNumber)
 
             const cellDesc = document.createElement("div")
-            cellDesc.classsName = "description"
+            cellDesc.className = "description"
             cell.append(cellDesc)
 
             calendar.append(cell)
