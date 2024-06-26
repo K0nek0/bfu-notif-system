@@ -93,7 +93,27 @@ document.addEventListener("DOMContentLoaded", event => {
         } else monthFurther++
         updateCalendar(monthFurther, yearFurther)
     })
+
+    function buildCalendarLayout() {
+        calendar.innerHTML = ""
+        let totalCells = 6 * 7
+        for(let i = 0; i < totalCells; i++) {
+            const cell = document.createElement("div")
+            cell.className = "calendar-cell"
+
+            const dateNumber = document.createElement("div")
+            dateNumber.className = "date-number"
+            cell.append(dateNumber)
+
+            const cellDesc = document.createElement("div")
+            cellDesc.classsName = "description"
+            cell.append(cellDesc)
+
+            calendar.append(cell)
+        }
+    }
     
+    buildCalendarLayout()
     let now = new Date()
     updateCalendar(now.getMonth(), now.getFullYear())
     console.log("Calendar script loaded")
