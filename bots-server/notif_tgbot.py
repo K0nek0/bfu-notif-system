@@ -1,6 +1,8 @@
 import telebot
 
-bot = telebot.TeleBot('7275660382:AAGLrZFJDaayCToiDB-4G2r8gwppILpDoao')
+with open('credentials.TXT', 'r') as file:
+    bot_token = file.read()
+bot = telebot.TeleBot(bot_token)
 
 @bot.message_handler(commands=['start'])
 def main(message):
