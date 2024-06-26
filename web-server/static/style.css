@@ -10,7 +10,7 @@ body {
     background: #f9f9f9;
 }
 .calendar-block {
-    max-width: 1050px;
+    max-width: 850px;
     margin: 0 auto;
 }
 
@@ -101,7 +101,7 @@ body {
 .calendar-cell .date-number {
     margin-left: 10%;
     margin-right: auto;
-    font-size: 1.3cm;
+    font-size: 1cm;
     font-weight: 500;
 }
 .calendar-cell .description {
