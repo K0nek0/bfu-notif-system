@@ -6,6 +6,7 @@ with open('credentials.TXT', 'r') as file:
     bot_token = file.read()
 bot = telebot.TeleBot(bot_token)
 commands = bot.get_my_commands()
+command_list = "\n".join([f"/{command.command} - {command.description}" for command in commands])
 @bot.message_handler(commands=['website', 'site'])
 def site(message):
     webbrowser.open('url')
@@ -41,10 +42,9 @@ def on_click(message):
         bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!')
         bot.register_next_step_handler(message, on_click)
     elif message.text == 'Список команд':
-        bot.send_message(message.chat.id, 'Список команд:\n')
-        for command in commands:
-            bot.send_message(message.chat.id, f"/{command.command} - {command.description}\n")
-        bot.register_next_step_handler(message, on_click)
+        bot.send_message(message.chat.id, f'Список команд:\n'
+                                          f'{command_list}')
+
 
 
 # @bot.message_handler(commands=['stop'])
