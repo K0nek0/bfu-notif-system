@@ -7,9 +7,9 @@ PORT = 8000
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path == '/':
+        if self.path == '/' or self.path == '/index' or self.path == '/index.html':
             self.path = os.path.join('pages', 'index.html')
-        elif self.path == '/admin':
+        elif self.path == '/admin' or self.path == '/admin.html':
             self.path = os.path.join('pages', 'admin.html')
         elif self.path.startswith('/static/'):
             self.path = self.path[1:]
