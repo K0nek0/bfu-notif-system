@@ -1,5 +1,4 @@
 import telebot
-import webbrowser
 from telebot import types
 
 with open('credentials.TXT', 'r') as file:
@@ -7,9 +6,7 @@ with open('credentials.TXT', 'r') as file:
 bot = telebot.TeleBot(bot_token)
 commands = bot.get_my_commands()
 command_list = "\n".join([f"/{command.command} - {command.description}" for command in commands])
-@bot.message_handler(commands=['website', 'site'])
-def site(message):
-    webbrowser.open('url')
+
 @bot.message_handler(commands=['start'])
 def start(message):
 
@@ -44,15 +41,18 @@ def on_click(message):
     elif message.text == 'Список команд':
         bot.send_message(message.chat.id, f'Список команд:\n'
                                           f'{command_list}')
+        bot.register_next_step_handler(message, on_click),
 
+@bot.message_handler(commands=['sub'])
+def stop(message):
+    bot.send_message(message.chat.id, 'Вы успешно подписались на рассылку!')
+@bot.message_handler(commands=['unsub'])
+def stop(message):
+    bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!')
 
-
-# @bot.message_handler(commands=['stop'])
-# def stop(message):
-#     bot.send_message(message.chat.id, 'Вы отписались от уведомлений!')
-#
-# @bot.message_handler(commands=['help'])
-# def help(message):
-#     bot.send_message(message.chat.id, '<b>Доступные команды</b>:', parse_mode='html')
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.send_message(message.chat.id, f'Список команд:\n'
+                                      f'{command_list}')
 
 bot.polling(none_stop=True)
