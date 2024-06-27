@@ -1,4 +1,4 @@
-const SERVER = 'http://localhost:3000';
+const SERVER = 'http://127.0.0.1:8000';
 
 // Функция форматирования даты
 const formatDate = (date) => {
@@ -59,7 +59,7 @@ const renderTable = (list) => {
         .then((res) => res);
 
       // ТО КАК ДОЛЖНО БЫТЬ
-      // const newList = await fetch(`${SERVER}/list`, {
+      // const newList = await fetch(`${SERVER}/notification`, {
       //   method: 'DELETE',
       //   headers: {
       //     'Content-Type': 'application/json;charset=utf-8',
@@ -100,7 +100,7 @@ form.addEventListener('submit', async (e) => {
     .then((res) => res);
 
   // ТО КАК ДОЛЖНО БЫТЬ
-  // const newList = await fetch(`${SERVER}/list`, {
+  // const newList = await fetch(`${SERVER}/notification`, {
   //   method: 'POST',
   //   headers: {
   //     'Content-Type': 'application/json;charset=utf-8',
@@ -128,7 +128,7 @@ form.addEventListener('submit', async (e) => {
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
-  const notificationList = await fetch(`${SERVER}/list`)
+  const notificationList = await fetch(`${SERVER}/notification`)
     .then((res) => res.json())
     .then((res) => res);
 
