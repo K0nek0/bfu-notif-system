@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <link rel="stylesheet" href="../static/admin-style.css">
+    <script src="../static/scripts/admin.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <title>Админка</title>
+  </head>
+  <body>
+    <div class="calendar-block">
+      <a href="./index.html">Назад</a>
+      <div class="admin-block">
+        <h1>Создание нового оповещения</h1>
+        <form action="#" id="form">
+          <div class="admin__form-block">
+            <label for="title">Заголовок:</label>
+            <input id="title" name="title" type="text" required>
+          </div>
+          <div class="admin__form-block">
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description"></textarea>
+          </div>
+          <div class="admin__form-block">
+            <label for="datetime">Дата и время:</label>
+            <input id="datetime" name="datetime" type="datetime-local" required>
+          </div>
+          <div class="admin__form-block">
+            <label for="color">Цвет для заголовка:</label>
+            <input type="color" value="#ffffff" id="color">
+          </div>
+          <div class="form-submit">
+            <input type="submit" value="Создать оповещение">
+          </div>
+        </form>
+      </div>
+      <div class="admin-block">
+        <h1>Список оповещений</h1>
+        <table>
+          <thead id="table-head">
+            <tr>
+              <th>Уведомление</th>
+              <th>Дата и время</th>
+              <th>Описание</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
