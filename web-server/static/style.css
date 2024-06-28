@@ -1,6 +1,7 @@
 :root {
     --accent-color: rgb(0,166,255);
-    --accent-color-hover: rgb(74,192,255)
+    --accent-color-hover: rgb(74,192,255);
+    --nav-icons-size: 26px;
 }
 
 body {
@@ -9,6 +10,58 @@ body {
     font-family: 'Segoe UI';
     background: #f9f9f9;
 }
+
+nav {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    user-select: none;
+}
+nav div {
+    margin: 0 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.nav-title {
+    font-size: 24px;
+    font-weight: 600;
+}
+.nav-icons {
+    gap: 10px;
+    margin-right: 20px;
+}
+.nav-icons a {
+    display: flex;
+    text-decoration: none;
+}
+.nav-icons > * {
+    filter: drop-shadow(0 0 5px rgba(0,0,0,.05));
+}
+/* Nav icons size */
+.nav-icons span {
+    font-size: var(--nav-icons-size);
+    color: var(--accent-color);
+}
+.nav-icons span:hover {
+    color: var(--accent-color-hover);
+    cursor: pointer;
+}
+.nav-icons img {
+    width: var(--nav-icons-size);
+    height: var(--nav-icons-size);
+    margin: 0;
+    border-radius: 50%;
+}
+
+
 .calendar-block {
     max-width: 850px;
     margin: 0 auto;
