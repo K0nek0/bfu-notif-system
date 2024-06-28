@@ -1,4 +1,19 @@
 document.addEventListener("DOMContentLoaded", event => {
+    // EVENTS CARDS SCRIPT
+    let cardWidth = 325 // From style.css
+    let gap = 10
+
+    const eventsCarousel = document.getElementById("events-carousel")
+    document.getElementById("previous-event").addEventListener("click", () => {
+        eventsCarousel.scrollLeft -= cardWidth + gap
+    })
+    document.getElementById("next-event").addEventListener("click", () => {
+        eventsCarousel.scrollLeft += cardWidth + gap
+    })
+
+
+
+    // CALENDAR SCRIPT
     const refreshBtn = document.getElementById("refresh")
     let refreshClicked = false
     refreshBtn.addEventListener("click", () => {

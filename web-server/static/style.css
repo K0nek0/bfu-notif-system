@@ -64,11 +64,71 @@ nav div {
 
 
 .nearest-events-container {
+    position: relative;
     width: 100%;
-    margin: 0 15px;
+    max-width: 1150px;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    background: #333;
+    border-radius: 15px;
+}
+#events-carousel {
+    width: fit-content;
+    max-width: 95vw;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    
+    scroll-behavior: smooth;
+    overflow: auto;
+    scroll-snap-type: x mandatory;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+#events-carousel::-webkit-scrollbar {
+    display: none;
+}
+.events-carousel-button {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+
+    height: 100%;
+    display: flex;
+    opacity: 0;
+    flex-direction: column;
+    justify-content: center;
+    transform: translateY(-50%);
+    user-select: none;
+}
+.events-carousel-button span {
+    font-size: 36px;
+}
+.events-carousel-button#previous-event {
+    left: 0;
+    background: linear-gradient(to right, rgba(0,0,0,.2) 0%, rgba(0,0,0,0) 100%);
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+.events-carousel-button#next-event {
+    right: 0;
+    background: linear-gradient(to left, rgba(0,0,0,.2) 5%, rgba(0,0,0,0) 100%);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+.events-carousel-button:hover {
+    opacity: 1;
 }
 
 .event-card {
+    flex-shrink: 0;
+    flex-grow: 0;
+    scroll-snap-align: center;
+    margin: 10px 0;
+
     width: 325px;
     height: 245px;
     position: relative;
@@ -85,6 +145,7 @@ nav div {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
+    user-select: none;
 }
 .event-date .color-line {
     width: 3px;
@@ -123,9 +184,9 @@ nav div {
     position: absolute;
     left: 0;
     bottom: 0;
-    background: linear-gradient(0deg, rgba(0,0,0,0.1) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(0deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 100%);
     transition: .3s;
-    color: #9a9a9a;
+    color: #777;
 }
 .event-text-container .event-text {
     margin: 5px 15px;
@@ -133,7 +194,7 @@ nav div {
 .event-card:hover > .event-text-container {
     height: 100%;
     overflow: auto;
-    background: #333;
+    background: #222;
     color: white;
 }
 .event-text-container::-webkit-scrollbar {
