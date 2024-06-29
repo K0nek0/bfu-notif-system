@@ -44,6 +44,15 @@ def unsubscribe(message):
 def help_command(message):
     bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
 
+@bot.message_handler(commands=['recent'])
+def recent_event(message):
+    # Вывод последнего события
+    bot.send_message(message.chat.id, 'recent_event', reply_markup=create_keyboard())
+@bot.message_handler(commands=['upcoming'])
+def upcoming_events(message):
+    # Вывод 3-5 следующх событий
+    bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
+
 @bot.message_handler(func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд'])
 def on_click(message):
     if message.text == 'Подписаться':
