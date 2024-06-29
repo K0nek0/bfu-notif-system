@@ -1,2 +1,5 @@
 /bots-server/.idea/
 /bots-server/credentials.TXT
+web-server/.env
+.idea
+*.pyc
