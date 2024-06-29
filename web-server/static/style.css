@@ -12,6 +12,9 @@ body {
 }
 
 nav {
+    position: sticky;
+    top: 0;
+    left: 0;
     width: 100%;
     display: flex;
     flex-wrap: nowrap;
@@ -23,6 +26,8 @@ nav {
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     user-select: none;
+    z-index: 100;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,.1))
 }
 nav div {
     margin: 0 10px;
@@ -212,7 +217,7 @@ nav div {
 
 .calendar-block {
     max-width: 850px;
-    margin: 0 auto;
+    margin: 25px auto;
 }
 
 .calendar-control {
