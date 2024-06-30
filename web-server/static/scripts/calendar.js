@@ -11,7 +11,66 @@ document.addEventListener("DOMContentLoaded", event => {
         eventsCarousel.scrollLeft += cardWidth + gap
     })
 
+    const categoriesColor = {
+        "important": "#F94E65",
+        "events": "#36F96A",
+        "study": "#5873F9"
+    }
 
+    function createEventCard(title, text, timestamp, category) {
+        const cardTime = new Date(timestamp)
+        let hours = cardTime.getHours()
+        if(hours < 10) hours = `0${hours}`
+        let minutes = cardTime.getMinutes()
+        if(minutes < 10) minutes = `0${minutes}`
+
+        const card = document.createElement("div")
+        card.className = "event-card"
+
+        const eventDate = document.createElement("div")
+        eventDate.className = "event-date"
+
+        const colorLine = document.createElement("div")
+        let color = categoriesColor[category]
+        if(!categoriesColor[category]) color = "#00AAF9" // Default Event Card Color
+        colorLine.style.background = color
+        colorLine.className = "color-line"
+        eventDate.append(colorLine)
+
+        const dateNumber = document.createElement("div")
+        dateNumber.className = "date-number"
+        dateNumber.textContent = cardTime.getDate()
+        eventDate.append(dateNumber)
+
+        const dateBlock = document.createElement("div")
+        dateBlock.className = "date-block"
+        const dateName = document.createElement("div")
+        dateName.textContent = cardTime.toLocaleString('ru', {
+            month: 'long',
+            day: 'numeric'
+        }).split(' ')[1]
+        dateBlock.append(dateName)
+        const dateTime = document.createElement("div")
+        dateTime.textContent = `в ${hours}:${minutes}`
+        dateBlock.append(dateTime)
+        eventDate.append(dateBlock)
+
+        const eventTitle = document.createElement("div")
+        eventTitle.className = "event-title"
+        eventTitle.textContent = title
+        
+        const eventTextContainer = document.createElement("div")
+        eventTextContainer.className = "event-text-container"
+        const eventText = document.createElement("div")
+        eventText.className = "event-text"
+        eventText.innerHTML = text.split("\n").join("<br>")
+        eventTextContainer.append(eventText)
+
+        card.append(eventDate)
+        card.append(eventTitle)
+        card.append(eventTextContainer)
+        return card
+    }
 
     // CALENDAR SCRIPT
     const refreshBtn = document.getElementById("refresh")
