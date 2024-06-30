@@ -1,4 +1,4 @@
-const SERVER = 'http://127.0.0.1:8000';
+const SERVER = 'http://localhost:3000/';
 
 // Функция форматирования даты
 const formatDate = (date) => {
@@ -25,7 +25,6 @@ const renderTable = (list) => {
   tableBody.setAttribute('id', 'table-body');
 
   tHead.after(tableBody);
-
   list.forEach((item) => {
     const iconBtn = document.createElement('button');
     iconBtn.innerHTML = 'delete';
@@ -111,7 +110,7 @@ form.addEventListener('submit', async (e) => {
   //   .then((res) => res);
 
   const successText = document.createElement('p');
-  successText.innerHTML = 'Успешно создано заявление';
+  successText.innerHTML = 'Заявление успешно создано';
   form.querySelector('.form-submit').append(successText);
 
   setTimeout(() => {
@@ -129,8 +128,13 @@ form.addEventListener('submit', async (e) => {
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
   const notificationList = await fetch(`${SERVER}/notification`)
-    .then((res) => res.json())
-    .then((res) => res);
+      .then((res) => res.json())
+      .then((res) => res);
 
   renderTable(notificationList);
 });
+const dataTime = document.getElementById("datetime")
+dataTime.min = new Date().toISOString().slice(0, -8);
+setInterval(()=>{
+  dataTime.min = new Date().toISOString().slice(0, -8);
+}, 10000)
