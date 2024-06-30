@@ -71,7 +71,7 @@ def upcoming_events(message):
     # Вывод 3-5 следующх событий
     bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
 
-@bot.message_handler(func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд'])
+@bot.message_handler(func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд', 'Последнее событие', 'Предстоящие события'])
 def on_click(message):
     if message.text == 'Подписаться':
         bot.send_message(message.chat.id, 'Выберете категорию:', reply_markup=create_categories())
@@ -79,6 +79,10 @@ def on_click(message):
         bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
     elif message.text == 'Список команд':
         bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
+    elif message.text == 'Последнее событие':
+        bot.send_message(message.chat.id, 'recent_event', reply_markup=create_keyboard())
+    elif message.text == 'Предстоящие события':
+        bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
 @bot.message_handler()
 def error(message):
     bot.send_message(message.chat.id, 'Неизвестная команда, используйте /help, чтобы вывести список команд',
