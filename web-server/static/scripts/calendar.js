@@ -98,6 +98,18 @@ document.addEventListener("DOMContentLoaded", async event => {
     }
 
     // CALENDAR SCRIPT
+    const events = {
+        
+    } // key:value = monthNumber:[{title,description,timestamp,category}]
+    async function fecthAllEvents() {
+        let data = await fetch("/events_all").then(response => {
+            if(response.status == 200) return response.json()
+        }).catch(err => {
+            // TODO Handle connect error
+        })
+        return []
+    }
+
     const refreshBtn = document.getElementById("refresh")
     let refreshClicked = false
     refreshBtn.addEventListener("click", () => {
