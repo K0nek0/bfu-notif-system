@@ -294,6 +294,7 @@ document.addEventListener("DOMContentLoaded", async event => {
 
 
     const recentEvents = await fetchRecentEvents()
+    if(recentEvents.length != 0) document.getElementById("events-carousel-empty").style.display = "none" 
     recentEvents.forEach((event) => {
         let eventCard = createEventCard(event.title, event.text, event.event_time, event.category)
         eventsCarousel.append(eventCard)
