@@ -56,10 +56,19 @@ document.addEventListener("DOMContentLoaded", async event => {
         eventsCarousel.scrollLeft += cardWidth + gap
     })
 
-    const categoriesColor = {
-        "important": "#F07427",
-        "event": "#36D593",
-        "study": "#627CFF"
+    const categories = {
+        "important": {
+            name: "Важное",
+            color: "#F07427"
+        },
+        "event": {
+            name: "Мероприятие",
+            color: "#36D593"
+        },
+        "study": {
+            name: "Обучение",
+            color: "#627CFF"
+        }
     }
 
     function createEventCard(title, text, timestamp, category) {
@@ -76,8 +85,8 @@ document.addEventListener("DOMContentLoaded", async event => {
         eventDate.className = "event-date"
 
         const colorLine = document.createElement("div")
-        let color = categoriesColor[category]
-        if(!categoriesColor[category]) color = "#00AAF9" // Default Event Card Color
+        let color = categories[category].color
+        if(!categories[category] || !categories[category].color) color = "#00AAF9" // Default Event Card Color
         colorLine.style.background = color
         colorLine.className = "color-line"
         eventDate.append(colorLine)
@@ -99,6 +108,13 @@ document.addEventListener("DOMContentLoaded", async event => {
         dateTime.textContent = `в ${hours}:${minutes}`
         dateBlock.append(dateTime)
         eventDate.append(dateBlock)
+
+        const eventCategory = document.createElement("div")
+        eventCategory.className = "event-category"
+        let displayCategory = ""
+        if(categories[category] && categories[category].name) displayCategory = categories[category].name
+        eventCategory.textContent = displayCategory
+        eventDate.append(eventCategory)
 
         const eventTitle = document.createElement("div")
         eventTitle.className = "event-title"
