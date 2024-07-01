@@ -15,14 +15,45 @@
             <a href="/admin">
                 <span class="material-symbols-rounded">admin_panel_settings</span>
             </a>
-            <span class="material-symbols-rounded">mail</span>
+            <span class="material-symbols-rounded" id="mail-subscribe">mail</span>
             <a href="https://t.me/bfu_notif_bot" target="_blank">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/512px-Telegram_2019_Logo.svg.png" draggable="false" alt="Telegram">
             </a>
         </div>
     </nav>
-
-
+    <div id="email-sub-modal" class="dark-modal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-close" id="email-sub-modal-close"><span class="material-symbols-rounded">close</span></div>
+            <div class="modal-content">
+                <h1>Подписаться на рассылку</h1>
+                <div>
+                    Вы можете подписаться на email рассылку и получать уведомления о выбранных категориях
+                    <br>
+                    Для этого введите адрес своей электронной почты ниже, выберите категории уведомлений и нажмите кнопку "Подписаться"
+                </div>
+                <br>
+                <form id="email-sub-form">
+                    Ваша почта:
+                    <input type="email" name="email" id="email-to-sub" placeholder="student@kantiana.ru">
+                    <br><br>
+                    Какие уведомления вы хотите получать?<br>
+                    <input type="checkbox" name="important" id="email-category-important" checked>
+                    <label for="email-category-important">Важное</label>
+                    <br>
+                    <input type="checkbox" name="event" id="email-category-event">
+                    <label for="email-category-event">Мероприятия</label>
+                    <br>
+                    <input type="checkbox" name="study" id="email-category-study">
+                    <label for="email-category-study">Обучение</label>
+                    <br><br>
+                    <div class="submit-block">
+                        <input type="submit" value="Подписаться">
+                        <div id="email-form-comment"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="nearest-events-container">
         <div class="events-carousel-button" id="previous-event">
             <span class="material-symbols-rounded">chevron_left</span>

@@ -1,6 +1,48 @@
 document.addEventListener("DOMContentLoaded", async event => {
-    // TODO EMAIL SUB MODAL SCRIPT
+    // EMAIL SUB MODAL SCRIPT
+    const modal = document.getElementById("email-sub-modal")
+    const modalForm = document.getElementById("email-sub-form")
+    const modalFormComment = document.getElementById("email-form-comment")
+    document.getElementById("mail-subscribe").addEventListener("click", () => {
+        modal.style.display = "flex"    
+    })
+    function hideEmailModal() {
+        if(modal.style.display == "none") return
+        modal.style.display = "none"
+        modalFormComment.textContent = ""
+        // Anims?
+    }
+    function showEmailSubmitError(text) {
+        modalFormComment.textContent = text
+        modalFormComment.style.color = "red"
+    }
+    modal.addEventListener("click", event => {
+        if(event.target.id == modal.id) hideEmailModal()
+    })
+    document.getElementById("email-sub-modal-close").addEventListener("click", () => hideEmailModal())
+    modalForm.addEventListener("submit", async event => {
+        event.preventDefault()
+        const formData = new FormData(modalForm)
+        let email = ""
+        let categories = []
+        formData.forEach((value, key) => {
+            if(key == "email") email = value
+            else if(value == "on") categories.push(key)
+        })
+        if(email.trim() == "") return showEmailSubmitError("Укажите адрес email")
+        if(categories.length == 0) return showEmailSubmitError("Необходимо выбрать как минимум одну категорию уведомлений")
 
+        fetch("/sub_email", {
+            method: "POST",
+            body: {email, categories}
+        }).then(response => {
+            modalFormComment.textContent = "Вы успешно подписались на email рассылку"
+            modalFormComment.style.color = "green"
+            setTimeout(() => {
+                hideEmailModal()
+            }, 3000)
+        }).catch(error => showEmailSubmitError("Не удалось подписаться. Попробуйте позже"))
+    })
 
     // EVENTS CARDS SCRIPT
     let cardWidth = 325 // From style.css
