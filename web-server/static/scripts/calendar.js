@@ -1,4 +1,7 @@
-document.addEventListener("DOMContentLoaded", event => {
+document.addEventListener("DOMContentLoaded", async event => {
+    // TODO EMAIL SUB MODAL SCRIPT
+
+
     // EVENTS CARDS SCRIPT
     let cardWidth = 325 // From style.css
     let gap = 10
@@ -12,9 +15,9 @@ document.addEventListener("DOMContentLoaded", event => {
     })
 
     const categoriesColor = {
-        "important": "#F94E65",
-        "events": "#36F96A",
-        "study": "#5873F9"
+        "important": "#F07427",
+        "event": "#36D593",
+        "study": "#627CFF"
     }
 
     function createEventCard(title, text, timestamp, category) {
@@ -112,6 +115,8 @@ document.addEventListener("DOMContentLoaded", event => {
             let offsetDayTimestamp = monthStart.getTime() - millisecondsInDay * (monthStart.getDay() - cellIndex - 1)
             let offsetedDay = new Date(offsetDayTimestamp)
             if(!cell.classList.contains("inactive")) cell.classList.add("inactive")
+            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
+            if(offsetedDay.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
             cell.children.item(0).textContent = offsetedDay.getDate()
             cell.children.item(1).textContent = ""
         }
@@ -139,6 +144,8 @@ document.addEventListener("DOMContentLoaded", event => {
         for(cellIndex; cellIndex < calendar.children.length; cellIndex++) {
             let cell = calendar.children.item(cellIndex)
             if(!cell.classList.contains("inactive")) cell.classList.add("inactive")
+            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
+            if(monthDay == updateDate.getDate() && currentCalendar.month + 1 == updateDate.getMonth()) cell.classList.add("current-date")
             cell.children.item(0).textContent = monthDay
             monthDay++
             cell.children.item(1).textContent = ""
@@ -192,6 +199,14 @@ document.addEventListener("DOMContentLoaded", event => {
         }
     }
     
+
+
+    const recentEvents = await fetchRecentEvents()
+    recentEvents.forEach((event) => {
+        let eventCard = createEventCard(event.title, event.text, event.event_time, event.category)
+        eventsCarousel.append(eventCard)
+    })
+
     buildCalendarLayout()
     let now = new Date()
     updateCalendar(now.getMonth(), now.getFullYear())
