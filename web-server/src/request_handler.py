@@ -34,6 +34,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content_type', 'text/css')
             elif self.path.endswith('.js'):
                 self.send_header('Content_type', 'application/javascript')
+            elif self.path.endswith('.ico'):
+                self.send_header('Content_type', 'image/x-icon')
             self.end_headers()
             self.wfile.write(file_to_open)
         except FileNotFoundError:
