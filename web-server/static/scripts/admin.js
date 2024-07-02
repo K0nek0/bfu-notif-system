@@ -143,10 +143,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const textarea = document.getElementById("description");
 
   textarea.addEventListener("input", function() {
-    textarea.style.height = "auto"; // Reset height
-    textarea.style.height = textarea.scrollHeight + "px"; // Set to new height
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
   });
-
-  // Trigger the input event to set the initial height
   textarea.dispatchEvent(new Event('input'));
 });
