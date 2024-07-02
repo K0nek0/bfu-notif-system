@@ -1,0 +1,138 @@
+/* Общие стили */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+a {
+  text-decoration: none;
+  color: #4A76A8;
+  margin: 10px 0;
+  display: inline-block;
+}
+
+.calendar-block {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.admin-block {
+  margin-bottom: 40px;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 1.8em;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin__form-block {
+  margin-bottom: 15px;
+}
+
+.admin__form-block label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.admin__form-block input[type="text"],
+.admin__form-block textarea,
+.admin__form-block input[type="datetime-local"],
+.admin__form-block select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 50px;
+}
+
+.form-submit {
+  text-align: left;
+}
+
+.form-submit input[type="submit"] {
+  background-color: #4A76A8;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.form-submit input[type="submit"]:hover {
+  background-color: #3a5a7a;
+}
+
+/* Таблица оповещений */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table th,
+table td {
+  text-align: left;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+table th:last-child,
+table td:last-child {
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .calendar-block {
+    padding: 10px;
+  }
+
+  .admin__form-block input[type="text"],
+  .admin__form-block textarea,
+  .admin__form-block input[type="datetime-local"],
+  .admin__form-block select {
+    font-size: 0.9em;
+  }
+
+  .form-submit input[type="submit"] {
+    font-size: 0.9em;
+    padding: 8px 16px;
+  }
+
+  table th,
+  table td {
+    padding: 8px;
+  }
+}
