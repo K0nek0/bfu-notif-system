@@ -200,47 +200,26 @@ document.addEventListener("DOMContentLoaded", async event => {
         
         let millisecondsInDay = 24 * 60 * 60 * 1000
         let cellIndex = 0
+
+        // Works like offset for previous month in calendar
         let monthStartDay = monthStart.getDay() - 1
         if(monthStartDay == -1) monthStartDay = 6
-        for(cellIndex; cellIndex < monthStartDay; cellIndex++) {
-            let cell = calendar.children.item(cellIndex)
-            let offsetDayTimestamp = monthStart.getTime() - millisecondsInDay * (monthStart.getDay() - cellIndex - 1)
-            let offsetedDay = new Date(offsetDayTimestamp)
-            if(!cell.classList.contains("inactive")) cell.classList.add("inactive")
-            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
-            if(offsetedDay.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
-            cell.children.item(0).textContent = offsetedDay.getDate()
-            cell.children.item(1).textContent = ""
-        }
 
-        let monthDay = 1
-        let monthEnded = false
-        while(!monthEnded) {
-            let cell = calendar.children.item(cellIndex)
-            let monthDate = new Date(monthStart.getTime() + millisecondsInDay * (monthDay - 1))
-            if(monthDate.getMonth() != monthStart.getMonth()) {
-                monthEnded = true
-                continue
-            }
-            cellIndex++
-            if(cell.classList.contains("inactive")) cell.classList.remove("inactive")
-            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
-            if(monthDate.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
-            cell.children.item(0).textContent = monthDate.getDate()
-            monthDay++
-            // TODO Make server sync
-            cell.children.item(1).textContent = ""
-        }
+        let currentCellDate = new Date(monthStart.getTime() - millisecondsInDay * monthStartDay)
 
-        monthDay = 1
-        for(cellIndex; cellIndex < calendar.children.length; cellIndex++) {
-            let cell = calendar.children.item(cellIndex)
-            if(!cell.classList.contains("inactive")) cell.classList.add("inactive")
-            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
-            if(monthDay == updateDate.getDate() && currentCalendar.month + 1 == updateDate.getMonth()) cell.classList.add("current-date")
-            cell.children.item(0).textContent = monthDay
-            monthDay++
-            cell.children.item(1).textContent = ""
+        let cells = calendar.getElementsByClassName("calendar-cell")
+        for(let i = 0; i < cells.length; i++) {
+            let cell = cells.item(i)
+            
+            if(currentCellDate.getMonth() != monthStart.getMonth()) cell.classList.add("inactive")
+            else cell.classList.remove("inactive")
+            if(currentCellDate.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
+            else cell.classList.remove("current-date")
+
+            cell.children.item(0).textContent = currentCellDate.getDate()
+            cell.children.item(1).textContent = "" // TODO Make server sync
+
+            currentCellDate.setTime(currentCellDate.getTime() + millisecondsInDay)
         }
     }
 
