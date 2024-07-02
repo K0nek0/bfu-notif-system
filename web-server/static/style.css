@@ -404,3 +404,19 @@ nav div {
 .calendar-cell.current-date:hover {
     background: var(--accent-color-hover);
 }
+.calendar-cells-details {
+    background: white;
+    height: 30vh;
+    flex-basis: 100%;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,.05));
+    border-radius: 15px;
+    margin-right: 5px;
+}
+@keyframes open-details {
+    0% {
+        height: 0
+    }
+    100% {
+       height: 30vh;
+    }
+}

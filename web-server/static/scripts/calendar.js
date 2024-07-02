@@ -199,7 +199,6 @@ document.addEventListener("DOMContentLoaded", async event => {
         currentCalendar = {month, year}
         
         let millisecondsInDay = 24 * 60 * 60 * 1000
-        let cellIndex = 0
 
         // Works like offset for previous month in calendar
         let monthStartDay = monthStart.getDay() - 1
@@ -218,6 +217,7 @@ document.addEventListener("DOMContentLoaded", async event => {
 
             cell.children.item(0).textContent = currentCellDate.getDate()
             cell.children.item(1).textContent = "" // TODO Make server sync
+            cell.setAttribute("data-datestr", currentCellDate.toLocaleDateString("ru-RU"))
 
             currentCellDate.setTime(currentCellDate.getTime() + millisecondsInDay)
         }
@@ -251,9 +251,54 @@ document.addEventListener("DOMContentLoaded", async event => {
         updateCalendar(currentDate.getMonth(), currentDate.getFullYear())
     })
 
+
+    /**
+     * 
+     * @param {Node} detailBar 
+     */
+    function hideDateDetails(detailBar) {
+        detailBar.style.animation = ".5s open-details reverse"
+        detailBar.addEventListener("animationend", () => {
+            detailBar.style.animation = "none"
+            detailBar.style.display = "none"
+            detailBar.removeAttribute("data-showing")
+        }, {once: true})
+    }
+
+
+    function getDateDetails(date) {
+        let [day, month, year] = date.split(".")
+        
+    }
+
+    /**
+     * 
+     * @param {Node} cell 
+     * @param {Node} detailBar 
+     */
+    function showDateDetails(cell, detailBar) {
+        let allDetails = calendar.getElementsByClassName("calendar-cells-details")
+        for(let i = 0; i < allDetails.length; i++) {
+            let currentDetails = allDetails.item(i)
+            if(currentDetails == detailBar) continue
+            if(currentDetails.hasAttribute("data-showing")) hideDateDetails(currentDetails)
+        }
+        // If details aren't displayed
+        if(!detailBar.hasAttribute("data-showing")) {
+            detailBar.style.display = "flex"
+            detailBar.style.animation = ".5s open-details"
+            detailBar.addEventListener("animationend", () => {
+                detailBar.style.animation = "none"
+            }, {once: true})
+        }
+        detailBar.setAttribute("data-showing", cell.getAttribute("data-datestr"))
+        detailBar.textContent = cell.getAttribute("data-datestr")
+    }
+
     function buildCalendarLayout() {
         calendar.innerHTML = ""
         let totalCells = 6 * 7
+        let toBind = []
         for(let i = 0; i < totalCells; i++) {
             const cell = document.createElement("div")
             cell.className = "calendar-cell"
@@ -267,6 +312,23 @@ document.addEventListener("DOMContentLoaded", async event => {
             cell.append(cellDesc)
 
             calendar.append(cell)
+            toBind.push(cell)
+
+            // Each last day create new desc
+            if((i+1)%7 == 0) {
+                const details = document.createElement("div")
+                details.className = "calendar-cells-details"
+
+                details.style.display = "none"
+                toBind.forEach((bindCell) => {
+                    bindCell.addEventListener("click", () => {
+                        if(bindCell.classList.contains("inactive")) return
+                        showDateDetails(bindCell, details)
+                    })
+                })
+                calendar.append(details)
+                toBind = []
+            }
         }
     }
     
