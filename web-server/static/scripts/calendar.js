@@ -199,48 +199,27 @@ document.addEventListener("DOMContentLoaded", async event => {
         currentCalendar = {month, year}
         
         let millisecondsInDay = 24 * 60 * 60 * 1000
-        let cellIndex = 0
+
+        // Works like offset for previous month in calendar
         let monthStartDay = monthStart.getDay() - 1
         if(monthStartDay == -1) monthStartDay = 6
-        for(cellIndex; cellIndex < monthStartDay; cellIndex++) {
-            let cell = calendar.children.item(cellIndex)
-            let offsetDayTimestamp = monthStart.getTime() - millisecondsInDay * (monthStart.getDay() - cellIndex - 1)
-            let offsetedDay = new Date(offsetDayTimestamp)
-            if(!cell.classList.contains("inactive")) cell.classList.add("inactive")
-            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
-            if(offsetedDay.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
-            cell.children.item(0).textContent = offsetedDay.getDate()
-            cell.children.item(1).textContent = ""
-        }
 
-        let monthDay = 1
-        let monthEnded = false
-        while(!monthEnded) {
-            let cell = calendar.children.item(cellIndex)
-            let monthDate = new Date(monthStart.getTime() + millisecondsInDay * (monthDay - 1))
-            if(monthDate.getMonth() != monthStart.getMonth()) {
-                monthEnded = true
-                continue
-            }
-            cellIndex++
-            if(cell.classList.contains("inactive")) cell.classList.remove("inactive")
-            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
-            if(monthDate.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
-            cell.children.item(0).textContent = monthDate.getDate()
-            monthDay++
-            // TODO Make server sync
-            cell.children.item(1).textContent = ""
-        }
+        let currentCellDate = new Date(monthStart.getTime() - millisecondsInDay * monthStartDay)
 
-        monthDay = 1
-        for(cellIndex; cellIndex < calendar.children.length; cellIndex++) {
-            let cell = calendar.children.item(cellIndex)
-            if(!cell.classList.contains("inactive")) cell.classList.add("inactive")
-            if(cell.classList.contains("current-date")) cell.classList.remove("current-date")
-            if(monthDay == updateDate.getDate() && currentCalendar.month + 1 == updateDate.getMonth()) cell.classList.add("current-date")
-            cell.children.item(0).textContent = monthDay
-            monthDay++
-            cell.children.item(1).textContent = ""
+        let cells = calendar.getElementsByClassName("calendar-cell")
+        for(let i = 0; i < cells.length; i++) {
+            let cell = cells.item(i)
+            
+            if(currentCellDate.getMonth() != monthStart.getMonth()) cell.classList.add("inactive")
+            else cell.classList.remove("inactive")
+            if(currentCellDate.toDateString() == updateDate.toDateString()) cell.classList.add("current-date")
+            else cell.classList.remove("current-date")
+
+            cell.children.item(0).textContent = currentCellDate.getDate()
+            cell.children.item(1).textContent = "" // TODO Make server sync
+            cell.setAttribute("data-datestr", currentCellDate.toLocaleDateString("ru-RU"))
+
+            currentCellDate.setTime(currentCellDate.getTime() + millisecondsInDay)
         }
     }
 
@@ -272,9 +251,54 @@ document.addEventListener("DOMContentLoaded", async event => {
         updateCalendar(currentDate.getMonth(), currentDate.getFullYear())
     })
 
+
+    /**
+     * 
+     * @param {Node} detailBar 
+     */
+    function hideDateDetails(detailBar) {
+        detailBar.style.animation = ".5s open-details reverse"
+        detailBar.addEventListener("animationend", () => {
+            detailBar.style.animation = "none"
+            detailBar.style.display = "none"
+            detailBar.removeAttribute("data-showing")
+        }, {once: true})
+    }
+
+
+    function getDateDetails(date) {
+        let [day, month, year] = date.split(".")
+        
+    }
+
+    /**
+     * 
+     * @param {Node} cell 
+     * @param {Node} detailBar 
+     */
+    function showDateDetails(cell, detailBar) {
+        let allDetails = calendar.getElementsByClassName("calendar-cells-details")
+        for(let i = 0; i < allDetails.length; i++) {
+            let currentDetails = allDetails.item(i)
+            if(currentDetails == detailBar) continue
+            if(currentDetails.hasAttribute("data-showing")) hideDateDetails(currentDetails)
+        }
+        // If details aren't displayed
+        if(!detailBar.hasAttribute("data-showing")) {
+            detailBar.style.display = "flex"
+            detailBar.style.animation = ".5s open-details"
+            detailBar.addEventListener("animationend", () => {
+                detailBar.style.animation = "none"
+            }, {once: true})
+        }
+        detailBar.setAttribute("data-showing", cell.getAttribute("data-datestr"))
+        detailBar.textContent = cell.getAttribute("data-datestr")
+    }
+
     function buildCalendarLayout() {
         calendar.innerHTML = ""
         let totalCells = 6 * 7
+        let toBind = []
         for(let i = 0; i < totalCells; i++) {
             const cell = document.createElement("div")
             cell.className = "calendar-cell"
@@ -288,6 +312,23 @@ document.addEventListener("DOMContentLoaded", async event => {
             cell.append(cellDesc)
 
             calendar.append(cell)
+            toBind.push(cell)
+
+            // Each last day create new desc
+            if((i+1)%7 == 0) {
+                const details = document.createElement("div")
+                details.className = "calendar-cells-details"
+
+                details.style.display = "none"
+                toBind.forEach((bindCell) => {
+                    bindCell.addEventListener("click", () => {
+                        if(bindCell.classList.contains("inactive")) return
+                        showDateDetails(bindCell, details)
+                    })
+                })
+                calendar.append(details)
+                toBind = []
+            }
         }
     }
     
