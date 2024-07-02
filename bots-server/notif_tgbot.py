@@ -10,15 +10,14 @@ bot = telebot.TeleBot(bot_token)
 commands = bot.get_my_commands()
 command_list = "\n".join([f"/{command.command} - {command.description}" for command in commands])
 
-# SERVER_HOST = '213.149.8.176'
-# SERVER_PORT = 8001
-#
+SERVER_HOST = '213.149.8.176'
+SERVER_PORT = 8001
+
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 #     s.connect((SERVER_HOST, SERVER_PORT))
-#     s.sendall(b"Hello, world")
-#     data = s.recv(1024)
-#     json_data = data.decode('utf-8')
-# print(f"Received", data.decode('utf-8'))
+
+    # s.sendall(b"Hello, world")
+    # data = s.recv(1024)
 
 
 def get_id_with_target_category(json_data, target_category):
@@ -48,7 +47,10 @@ def create_categories():
     imp = types.KeyboardButton('Важное')
     event = types.KeyboardButton('Развлекательное')
     study = types.KeyboardButton('Обучение')
-    markup2.row(imp, event, study)
+    back = types.KeyboardButton('Назад')
+    markup2.row(imp, study)
+    markup2.row(event)
+    markup2.row(back)
     return markup2
 
 # def send_message(target_category):
@@ -96,19 +98,51 @@ def start(message):
 @bot.message_handler(commands=['sub'])
 def subscribe(message):
     bot.send_message(message.chat.id, 'Выберите категорию:', reply_markup=create_categories())
-
+@bot.message_handler(func=lambda message: message.text == 'Назад')
+def back(message):
+    bot.send_message(message.chat.id, 'Вы в главном меню!', reply_markup=create_keyboard())
 
 @bot.message_handler(func=lambda message: message.text in ['Важное', 'Развлекательное', 'Обучение'])
 def category_sub(message):
 
-    category = message.text
-    bot.send_message(message.chat.id, f'Вы успешно подписались на {category}!',
-                     reply_markup=create_keyboard())
-    
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((SERVER_HOST, SERVER_PORT))
+
+        category = message.text
+        bot.send_message(message.chat.id, f'Вы успешно подписались на {category}!',
+                         reply_markup=create_keyboard())
+        person = {
+            "user_id": message.chat.id,
+            "category": category
+        }
+
+        json_data = json.dumps(person, ensure_ascii=False)
+        s.sendall(json_data.encode('utf-8'))
+
+        # conn, addr = s.accept()
+        # with conn:
+        #     print(f"Connected by {addr}")
+        #     while True:
+        #         data = conn.recv(1024)
+        #         if not data:
+        #             break
+        #         conn.sendall(data)
+
+        # data = s.recv(1024)
+        # print(data.decode('utf-8'))
+
+
 @bot.message_handler(commands=['unsub'])
 def unsubscribe(message):
-    bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
-
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((SERVER_HOST, SERVER_PORT))
+        bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
+        person = {
+            "user_id": message.chat.id,
+            "category": "Отписка"
+        }
+        json_data = json.dumps(person, ensure_ascii=False)
+        s.sendall(json_data.encode('utf-8'))
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
