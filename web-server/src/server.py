@@ -2,11 +2,12 @@ import os
 import socket
 import socketserver
 import threading
+import json
 from request_handler import RequestHandler
 from database import Database
 from dotenv import load_dotenv
 
-HOST, PORT = "185.16.137.205", 8000
+PORT = 8000
 
 load_dotenv()
 db_path = os.getenv('DATABASE_PATH')
@@ -24,19 +25,34 @@ def start_http_server():
         httpd.serve_forever()
 
 
+def handle_socket_client(conn, addr):
+    print(f"Connected by {addr}")
+    buffer = b""
+    while True:
+        db = conn.recv(1024)
+        if not db:
+            break
+        buffer += db
+
+    try:
+        json_data = json.loads(buffer.decode('utf-8'))
+        handler.add_data_to_db(json_data)
+        conn.sendall(b"Data received and added to database")
+    except json.JSONDecodeError:
+        conn.sendall(b"Invalid JSON db")
+    finally:
+        conn.close()
+
+
 def start_socket_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("", PORT + 1))
         s.listen()
         print(f"\nSocket server listening on port {PORT + 1}")
-        conn, addr = s.accept()
-        with conn:
-            print(f"Connected by {addr}")
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                conn.sendall(data)
+        while True:
+            conn, addr = s.accept()
+            client_thread = threading.Thread(target=handle_socket_client, args=(conn, addr))
+            client_thread.start()
 
 
 if __name__ == "__main__":
