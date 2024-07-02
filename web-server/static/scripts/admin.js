@@ -1,4 +1,4 @@
-const SERVER = 'http://127.0.0.1:8000';
+const SERVER = 'http://localhost:3000/';
 
 // Функция форматирования даты
 const formatDate = (date) => {
@@ -25,7 +25,6 @@ const renderTable = (list) => {
   tableBody.setAttribute('id', 'table-body');
 
   tHead.after(tableBody);
-
   list.forEach((item) => {
     const iconBtn = document.createElement('button');
     iconBtn.innerHTML = 'delete';
@@ -38,7 +37,7 @@ const renderTable = (list) => {
     const thDateTime = document.createElement('th');
     const thDelete = document.createElement('th');
 
-    thTitle.setAttribute('style', `color: ${item.color}`);
+    // thTitle.setAttribute('style', `color: ${item.color}`);
 
     thTitle.innerHTML = item.title;
     thDescription.innerHTML = item.description || '';
@@ -84,13 +83,13 @@ form.addEventListener('submit', async (e) => {
   const title = form.querySelector('#title');
   const description = form.querySelector('#description');
   const datetime = form.querySelector('#datetime');
-  const color = form.querySelector('#color');
+  const category = form.querySelector('#category');
 
   const notification = {
     title: title.value,
     description: description.value || '',
     datetime: datetime.value,
-    color: color.value,
+    category: category.value,
   };
   console.log('Уведомление: ', notification);
 
@@ -111,7 +110,7 @@ form.addEventListener('submit', async (e) => {
   //   .then((res) => res);
 
   const successText = document.createElement('p');
-  successText.innerHTML = 'Успешно создано заявление';
+  successText.innerHTML = 'Заявление успешно создано';
   form.querySelector('.form-submit').append(successText);
 
   setTimeout(() => {
@@ -123,14 +122,29 @@ form.addEventListener('submit', async (e) => {
   title.value = '';
   description.value = '';
   datetime.value = '';
-  color.value = '#ffffff';
+  category.value = '';
 });
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
   const notificationList = await fetch(`${SERVER}/notification`)
-    .then((res) => res.json())
-    .then((res) => res);
+      .then((res) => res.json())
+      .then((res) => res);
 
   renderTable(notificationList);
+});
+const dataTime = document.getElementById("datetime")
+dataTime.min = new Date().toISOString().slice(0, -8);
+setInterval(()=>{
+  dataTime.min = new Date().toISOString().slice(0, -8);
+}, 10000)
+
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.getElementById("description");
+
+  textarea.addEventListener("input", function() {
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  });
+  textarea.dispatchEvent(new Event('input'));
 });

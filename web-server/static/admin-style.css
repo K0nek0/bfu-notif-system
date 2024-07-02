@@ -1,77 +1,138 @@
-.admin__form-block {
-  display: block;
-  margin-bottom: 14px;
+/* Общие стили */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
 }
 
-.admin__form-block:last-child {
-  margin-bottom: 0;
+a {
+  text-decoration: none;
+  color: #4A76A8;
+  margin: 10px 0;
+  display: inline-block;
+}
+
+.calendar-block {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 .admin-block {
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 }
 
-.admin-block:last-child {
-  margin-bottom: 0;
+h1 {
+  margin-top: 0;
+  font-size: 1.8em;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin__form-block {
+  margin-bottom: 15px;
+}
+
+.admin__form-block label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.admin__form-block input[type="text"],
+.admin__form-block textarea,
+.admin__form-block input[type="datetime-local"],
+.admin__form-block select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 50px;
 }
 
 .form-submit {
-  display: flex;
-  align-items: center;
+  text-align: left;
 }
 
-.form-submit input {
-  margin-right: 12px;
-}
-
-.form-submit p {
-  margin: 0;
-}
-
-.admin-delete {
-  background-color: inherit;
-  border: none;
+.form-submit input[type="submit"] {
+  background-color: #4A76A8;
   color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
   cursor: pointer;
 }
 
-.admin-delete:hover {
-  border-radius: 12px;
-  background-color: white;
-  color: #0066cc;
+.form-submit input[type="submit"]:hover {
+  background-color: #3a5a7a;
 }
 
+/* Таблица оповещений */
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 2px solid #0066cc;
-  border-radius: 8px;
-  overflow: hidden;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-th {
-  background-color: #0066cc;
-  color: white;
-  padding: 12px;
+table th,
+table td {
+  text-align: left;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+table th:last-child,
+table td:last-child {
   text-align: center;
-  border-bottom: 2px solid #004080;
 }
 
-td {
-  padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
-  text-align: center;
-}
+@media (max-width: 600px) {
+  .calendar-block {
+    padding: 10px;
+  }
 
-tr:nth-child(even) {
-  background-color: #e0f7fa;
-}
+  .admin__form-block input[type="text"],
+  .admin__form-block textarea,
+  .admin__form-block input[type="datetime-local"],
+  .admin__form-block select {
+    font-size: 0.9em;
+  }
 
-tr:nth-child(odd) {
-  background-color: #ffffff;
-}
+  .form-submit input[type="submit"] {
+    font-size: 0.9em;
+    padding: 8px 16px;
+  }
 
-table:hover {
-  box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+  table th,
+  table td {
+    padding: 8px;
+  }
 }
