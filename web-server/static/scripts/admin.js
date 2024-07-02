@@ -138,3 +138,15 @@ dataTime.min = new Date().toISOString().slice(0, -8);
 setInterval(()=>{
   dataTime.min = new Date().toISOString().slice(0, -8);
 }, 10000)
+
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.getElementById("description");
+
+  textarea.addEventListener("input", function() {
+    textarea.style.height = "auto"; // Reset height
+    textarea.style.height = textarea.scrollHeight + "px"; // Set to new height
+  });
+
+  // Trigger the input event to set the initial height
+  textarea.dispatchEvent(new Event('input'));
+});
