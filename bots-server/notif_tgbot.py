@@ -138,17 +138,32 @@ def upcoming_events(message):
     func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд', 'Последнее событие',
                                           'Предстоящие события'])
 def on_click(message):
-    if message.text == 'Подписаться':
-        bot.send_message(message.chat.id, 'Выберите категорию:', reply_markup=create_categories())
-    elif message.text == 'Отписаться':
-        bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
-    elif message.text == 'Список команд':
-        bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
-    elif message.text == 'Последнее событие':
-        bot.send_message(message.chat.id, 'recent_event', reply_markup=create_keyboard())
-    elif message.text == 'Предстоящие события':
-        bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
+    
+    msgTextDict ={
+        'Подписаться': {
+            'text': "Выберите категорию:",
+            'markup': create_categories
+        },
+        'Отписаться': {
+            'text': "Вы успешно отписались от рассылки!",
+            'markup': create_keyboard
+        },
+        'Список команд': {
+            'text': f'Список команд:\n{command_list}',
+            'markup': create_keyboard
+        },
+        'Последнее событие': {
+            'text': "recent_event",
+            'markup': create_keyboard
+        },
+        'Предстоящие события': {
+            'text': "upcoming_events",
+            'markup': create_keyboard
+        }
 
+    }
+    replyDict = msgTextDict[message.text]
+    bot.send_message(message.chat.id, replyDict['text'], reply_markup=replyDict['markup']())
 
 @bot.message_handler()
 def error(message):
