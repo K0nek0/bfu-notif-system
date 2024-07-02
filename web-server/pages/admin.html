@@ -31,8 +31,12 @@
             <input id="datetime" name="datetime" type="datetime-local" required>
           </div>
           <div class="admin__form-block">
-            <label for="color">Цвет для заголовка:</label>
-            <input type="color" value="#ffffff" id="color">
+            <label for="category">Категория:</label>
+            <select id="category">
+              <option value="Важное">Важное</option>
+              <option value="Мероприятие">Мероприятие</option>
+              <option value="Учёба">Учёба</option>
+            </select>
           </div>
           <div class="form-submit">
             <input type="submit" value="Создать оповещение">

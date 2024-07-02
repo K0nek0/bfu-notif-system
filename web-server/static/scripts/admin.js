@@ -37,7 +37,7 @@ const renderTable = (list) => {
     const thDateTime = document.createElement('th');
     const thDelete = document.createElement('th');
 
-    thTitle.setAttribute('style', `color: ${item.color}`);
+    // thTitle.setAttribute('style', `color: ${item.color}`);
 
     thTitle.innerHTML = item.title;
     thDescription.innerHTML = item.description || '';
@@ -83,13 +83,13 @@ form.addEventListener('submit', async (e) => {
   const title = form.querySelector('#title');
   const description = form.querySelector('#description');
   const datetime = form.querySelector('#datetime');
-  const color = form.querySelector('#color');
+  const category = form.querySelector('#category');
 
   const notification = {
     title: title.value,
     description: description.value || '',
     datetime: datetime.value,
-    color: color.value,
+    category: category.value,
   };
   console.log('Уведомление: ', notification);
 
@@ -122,7 +122,7 @@ form.addEventListener('submit', async (e) => {
   title.value = '';
   description.value = '';
   datetime.value = '';
-  color.value = '#ffffff';
+  category.value = '';
 });
 
 // Запрос на список при входе на страницу
