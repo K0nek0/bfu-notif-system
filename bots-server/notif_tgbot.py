@@ -104,14 +104,7 @@ def category_sub(message):
     category = message.text
     bot.send_message(message.chat.id, f'Вы успешно подписались на {category}!',
                      reply_markup=create_keyboard())
-    # if message.text == 'Важное':
-    #     bot.send_message(check_category(json_data, "Важное"), 'Вы успешно подписались на Важное!', reply_markup=create_keyboard())
-    # elif message.text == 'Развлекательное':
-    #     bot.send_message(message.chat.id, 'Вы успешно подписались на Развлекательное!', reply_markup=create_keyboard())
-    # elif message.text == 'Обучение':
-    #     bot.send_message(message.chat.id, 'Вы успешно подписались на Обучение!', reply_markup=create_keyboard())
-
-
+    
 @bot.message_handler(commands=['unsub'])
 def unsubscribe(message):
     bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
@@ -138,7 +131,7 @@ def upcoming_events(message):
     func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд', 'Последнее событие',
                                           'Предстоящие события'])
 def on_click(message):
-    
+
     msgTextDict ={
         'Подписаться': {
             'text': "Выберите категорию:",
