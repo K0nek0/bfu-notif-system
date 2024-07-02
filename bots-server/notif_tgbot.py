@@ -12,10 +12,20 @@ def create_keyboard():
     sub_btn = types.KeyboardButton('Подписаться')
     unsub_btn = types.KeyboardButton('Отписаться')
     help_btn = types.KeyboardButton('Список команд')
+    recent_btn = types.KeyboardButton('Последнее событие')
+    upcoming_btn = types.KeyboardButton('Предстоящие события')
     markup.row(sub_btn, unsub_btn)
+    markup.row(recent_btn, upcoming_btn)
     markup.row(help_btn)
     return markup
 
+def create_categories():
+    markup2 = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    imp = types.KeyboardButton('Важное')
+    event = types.KeyboardButton('Развлекательное')
+    study = types.KeyboardButton('Обучение')
+    markup2.row(imp, event, study)
+    return markup2
 @bot.message_handler(commands=['start'])
 def start(message):
     first_name = message.from_user.first_name
@@ -34,8 +44,16 @@ def start(message):
 
 @bot.message_handler(commands=['sub'])
 def subscribe(message):
-    bot.send_message(message.chat.id, 'Вы успешно подписались на рассылку!', reply_markup=create_keyboard())
+    bot.send_message(message.chat.id, 'Выберете категорию:', reply_markup=create_categories())
 
+@bot.message_handler(func=lambda message: message.text in ['Важное', 'Мероприятие', 'Обучение'])
+def category(message):
+    if message.text == 'Важное':
+        bot.send_message(message.chat.id, 'Вы успешно подписались на Важное!', reply_markup=create_keyboard())
+    elif message.text == 'Развлекательное':
+        bot.send_message(message.chat.id, 'Вы успешно подписались на Развлекательное!', reply_markup=create_keyboard())
+    elif message.text == 'Обучение':
+        bot.send_message(message.chat.id, 'Вы успешно подписались на Обучение!', reply_markup=create_keyboard())
 @bot.message_handler(commands=['unsub'])
 def unsubscribe(message):
     bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
@@ -44,14 +62,27 @@ def unsubscribe(message):
 def help_command(message):
     bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
 
-@bot.message_handler(func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд'])
+@bot.message_handler(commands=['recent'])
+def recent_event(message):
+    # Вывод последнего события
+    bot.send_message(message.chat.id, 'recent_event', reply_markup=create_keyboard())
+@bot.message_handler(commands=['upcoming'])
+def upcoming_events(message):
+    # Вывод 3-5 следующх событий
+    bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
+
+@bot.message_handler(func=lambda message: message.text in ['Подписаться', 'Отписаться', 'Список команд', 'Последнее событие', 'Предстоящие события'])
 def on_click(message):
     if message.text == 'Подписаться':
-        bot.send_message(message.chat.id, 'Вы успешно подписались на рассылку!', reply_markup=create_keyboard())
+        bot.send_message(message.chat.id, 'Выберете категорию:', reply_markup=create_categories())
     elif message.text == 'Отписаться':
         bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
     elif message.text == 'Список команд':
         bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
+    elif message.text == 'Последнее событие':
+        bot.send_message(message.chat.id, 'recent_event', reply_markup=create_keyboard())
+    elif message.text == 'Предстоящие события':
+        bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
 @bot.message_handler()
 def error(message):
     bot.send_message(message.chat.id, 'Неизвестная команда, используйте /help, чтобы вывести список команд',

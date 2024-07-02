@@ -14,7 +14,7 @@
   </head>
   <body>
     <div class="calendar-block">
-      <a href="./index.html">Назад</a>
+      <a href="/">Назад</a>
       <div class="admin-block">
         <h1>Создание нового оповещения</h1>
         <form action="#" id="form">
@@ -24,15 +24,19 @@
           </div>
           <div class="admin__form-block">
             <label for="description">Описание:</label>
-            <textarea id="description" name="description"></textarea>
+            <textarea id="description" name="description" required></textarea>
           </div>
           <div class="admin__form-block">
             <label for="datetime">Дата и время:</label>
             <input id="datetime" name="datetime" type="datetime-local" required>
           </div>
           <div class="admin__form-block">
-            <label for="color">Цвет для заголовка:</label>
-            <input type="color" value="#ffffff" id="color">
+            <label for="category">Категория:</label>
+            <select id="category">
+              <option value="Важное">Важное</option>
+              <option value="Мероприятие">Мероприятие</option>
+              <option value="Учёба">Учёба</option>
+            </select>
           </div>
           <div class="form-submit">
             <input type="submit" value="Создать оповещение">
