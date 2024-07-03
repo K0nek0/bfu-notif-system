@@ -30,10 +30,10 @@ def handle_socket_client(conn, addr):
     buffer = b""
     while True:
         try:
-            db = conn.recv(1024)
-            if not db:
+            data = conn.recv(1024)
+            if not data:
                 break
-            buffer += db
+            buffer += data
 
             try:
                 json_data = json.loads(buffer.decode('utf-8'))
@@ -62,7 +62,7 @@ def handle_socket_client(conn, addr):
 def start_socket_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("", PORT + 1))
-        s.listen(5)
+        s.listen(2)
         print(f"\nSocket server listening on port {PORT + 1}")
         while True:
             conn, addr = s.accept()
