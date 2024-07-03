@@ -1,4 +1,4 @@
-const SERVER = 'http://localhost:3000/';
+const SERVER = 'http://127.0.0.1:8000/';
 
 // Функция форматирования даты
 const formatDate = (date) => {
@@ -53,22 +53,22 @@ const renderTable = (list) => {
     // Событие удаления
     iconBtn.addEventListener('click', async () => {
       //КАК СЕЙЧАС
-      const newList = await fetch(`${SERVER}/delete`)
-        .then((res) => res.json())
-        .then((res) => res);
-
-      // ТО КАК ДОЛЖНО БЫТЬ
-      // const newList = await fetch(`${SERVER}/notification`, {
-      //   method: 'DELETE',
-      //   headers: {
-      //     'Content-Type': 'application/json;charset=utf-8',
-      //   },
-      //   body: JSON.stringify({
-      //     id: item.id,
-      //   }),
-      // })
+      // const newList = await fetch(`${SERVER}/delete`)
       //   .then((res) => res.json())
       //   .then((res) => res);
+
+      // ТО КАК ДОЛЖНО БЫТЬ
+      const newList = await fetch(`${SERVER}/notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+          id: item.id,
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => res);
 
       renderTable(newList);
     });
@@ -94,20 +94,20 @@ form.addEventListener('submit', async (e) => {
   console.log('Уведомление: ', notification);
 
   // ВРЕМЕННО ИЗ-ЗА СЕРВЕРА
-  const newList = await fetch(`${SERVER}/newElement`)
-    .then((res) => res.json())
-    .then((res) => res);
-
-  // ТО КАК ДОЛЖНО БЫТЬ
-  // const newList = await fetch(`${SERVER}/notification`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json;charset=utf-8',
-  //   },
-  //   body: JSON.stringify(notification),
-  // })
+  // const newList = await fetch(`${SERVER}/newElement`)
   //   .then((res) => res.json())
   //   .then((res) => res);
+
+  // ТО КАК ДОЛЖНО БЫТЬ
+  const newList = await fetch(`${SERVER}/notification`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+    },
+    body: JSON.stringify(notification),
+  })
+    .then((res) => res.json())
+    .then((res) => res);
 
   const successText = document.createElement('p');
   successText.innerHTML = 'Заявление успешно создано';
