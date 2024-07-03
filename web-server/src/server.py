@@ -34,20 +34,28 @@ def handle_socket_client(conn, addr):
             break
         buffer += db
 
-    try:
-        json_data = json.loads(buffer.decode('utf-8'))
-        handler.add_data_to_db(json_data)
-        conn.sendall(b"Data received and added to database")
-    except json.JSONDecodeError:
-        conn.sendall(b"Invalid JSON db")
-    finally:
-        conn.close()
+        try:
+            json_data = json.loads(buffer.decode('utf-8'))
+            if 'title' in json_data:
+                handler.add_event_to_db(json_data)
+                conn.sendall(b"Data received and added to database")
+            elif 'category' in json_data:
+                handler.add_user_to_db(json_data)
+                conn.sendall(b"Data received and added to database")
+                # json_data = json.dumps(json_data).encode('utf-8')
+                # conn.sendall(json_data)
+            elif 'delete' in json_data:
+                handler.delete_user_from_db(json_data)
+                conn.sendall(b"User and categories deleted from database")
+        except json.JSONDecodeError:
+            conn.sendall(b"Invalid JSON data")
+
 
 
 def start_socket_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("", PORT + 1))
-        s.listen()
+        s.listen(5)
         print(f"\nSocket server listening on port {PORT + 1}")
         while True:
             conn, addr = s.accept()
