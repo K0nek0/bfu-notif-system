@@ -193,6 +193,11 @@ document.addEventListener("DOMContentLoaded", async event => {
         let updateDate = new Date()
         let monthStart = new Date()
         monthStart.setFullYear(year, month, 1)
+        let details = calendar.getElementsByClassName("calendar-cells-details")
+        for(let i = 0; i < details.length; i++) {
+            let detailBlock = details.item(i)
+            hideDateDetails(detailBlock, true)
+        }
 
         let monthName = monthStart.toLocaleString("default", {month: "long"})
         currentMonthText.textContent = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`
@@ -217,7 +222,8 @@ document.addEventListener("DOMContentLoaded", async event => {
 
             cell.children.item(0).textContent = currentCellDate.getDate()
             cell.children.item(1).textContent = "" // TODO Make server sync
-            cell.setAttribute("data-datestr", currentCellDate.toLocaleDateString("ru-RU"))
+            //cell.setAttribute("data-datestr", currentCellDate.toLocaleDateString("ru-RU"))
+            cell.setAttribute("data-datestr", currentCellDate.toISOString())
 
             currentCellDate.setTime(currentCellDate.getTime() + millisecondsInDay)
         }
@@ -256,19 +262,55 @@ document.addEventListener("DOMContentLoaded", async event => {
      * 
      * @param {Node} detailBar 
      */
-    function hideDateDetails(detailBar) {
-        detailBar.style.animation = ".5s open-details reverse"
-        detailBar.addEventListener("animationend", () => {
+    function hideDateDetails(detailBar, noAnims) {
+        if(!detailBar.hasAttribute("data-showing")) return
+        function closeDetails() {
             detailBar.style.animation = "none"
             detailBar.style.display = "none"
             detailBar.removeAttribute("data-showing")
-        }, {once: true})
+        }
+        if(noAnims === true) return closeDetails()
+        detailBar.style.animation = ".5s open-details reverse"
+        detailBar.addEventListener("animationend", closeDetails, {once: true})
     }
 
 
-    function getDateDetails(date) {
-        let [day, month, year] = date.split(".")
-        
+    function setDateDetails(date, detailBar) {
+        //let [day, month, year] = date.split(".")
+        let selectedDate = new Date(date)
+        let selectedMonth = selectedDate.toLocaleString('ru', {
+            month: 'long',
+            day: 'numeric'
+        }).split(' ')[1]
+
+        const detailsContent = document.createElement("div")
+        detailsContent.className = "calendar-details-content"
+
+        const detailsHeader = document.createElement("div")
+        detailsHeader.className = "calendar-details-header"
+        const detailsTitle = document.createElement("h2")
+        detailsTitle.textContent = `События на ${selectedDate.getDate()} ${selectedMonth}`
+        detailsHeader.append(detailsTitle)
+        const detailsClose = document.createElement("span")
+        detailsClose.className = "material-symbols-rounded"
+        detailsClose.textContent = "close"
+        detailsClose.addEventListener("click", () => {
+            hideDateDetails(detailBar, false)
+        })
+        detailsHeader.append(detailsClose)
+        detailsContent.append(detailsHeader)
+
+        const detailsCards = document.createElement("div")
+        detailsCards.className = "calendar-details-cards"
+        // TODO Use fetched data
+        for(let i = 0; i < 4; i++) {
+            let displayCard = createEventCard("Hello, world!", "Some text goes here", new Date().getTime() + 300000, "event")
+            detailsCards.append(displayCard)
+        }
+        detailsContent.append(detailsCards)
+
+        detailBar.innerHTML = ""
+        detailBar.append(detailsContent)
     }
 
     /**
@@ -292,7 +334,8 @@ document.addEventListener("DOMContentLoaded", async event => {
             }, {once: true})
         }
         detailBar.setAttribute("data-showing", cell.getAttribute("data-datestr"))
-        detailBar.textContent = cell.getAttribute("data-datestr")
+        //detailBar.textContent = cell.getAttribute("data-datestr")
+        setDateDetails(cell.getAttribute("data-datestr"), detailBar)
     }
 
     function buildCalendarLayout() {
