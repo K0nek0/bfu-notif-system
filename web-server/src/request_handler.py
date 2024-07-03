@@ -37,37 +37,54 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404, "File not found")
 
     def add_event_to_db(json_data):
-        query = "INSERT INTO events (title, description, category, event_time) VALUES (?, ?, ?, ?)"
-        RequestHandler._database.cursor.execute(query, (json_data['title'],
-                                                        json_data['description'],
-                                                        json_data['category'],
-                                                        json_data['event_time']))
-        RequestHandler._database.conn.commit()
+        try:
+            query = "INSERT INTO events (title, description, category, event_time) VALUES (?, ?, ?, ?)"
+            RequestHandler._database.cursor.execute(query, (json_data['title'],
+                                                            json_data['description'],
+                                                            json_data['category'],
+                                                            json_data['event_time']))
+            RequestHandler._database.conn.commit()
+
+        except Exception as e:
+            print(f"Error when adding an event to the database: {e}")
 
     def add_user_to_db(json_data):
-        query = "INSERT OR IGNORE INTO telegram_users (user_id) VALUES (?)"
-        RequestHandler._database.cursor.execute(query, (json_data['user_id'],))
-        RequestHandler._database.conn.commit()
+        try:
+            query = "INSERT OR IGNORE INTO telegram_users (user_id) VALUES (?)"
+            RequestHandler._database.cursor.execute(query, (json_data['user_id'],))
+            RequestHandler._database.conn.commit()
 
-        query = "SELECT id FROM telegram_users WHERE user_id = ?"
-        RequestHandler._database.cursor.execute(query, (json_data['user_id'],))
-        user_db_id = RequestHandler._database.cursor.fetchone()[0]
+            query = "SELECT id FROM telegram_users WHERE user_id = ?"
+            RequestHandler._database.cursor.execute(query, (json_data['user_id'],))
+            user_db_id = RequestHandler._database.cursor.fetchone()[0]
 
-        query = "SELECT id FROM categories WHERE category = ?"
-        RequestHandler._database.cursor.execute(query, (json_data['category'],))
-        category_db_id = RequestHandler._database.cursor.fetchone()[0]
+            query = "SELECT id FROM categories WHERE category = ?"
+            RequestHandler._database.cursor.execute(query, (json_data['category'],))
+            category_db_id = RequestHandler._database.cursor.fetchone()[0]
 
-        query = "INSERT OR IGNORE INTO user_categories (user_id, category_id) VALUES (?, ?)"
-        RequestHandler._database.cursor.execute(query, (user_db_id, category_db_id))
-        RequestHandler._database.conn.commit()
+            query = "INSERT OR IGNORE INTO user_categories (user_id, category_id) VALUES (?, ?)"
+            RequestHandler._database.cursor.execute(query, (user_db_id, category_db_id))
+            RequestHandler._database.conn.commit()
+
+        except Exception as e:
+            print(f"Error when adding a user to the database: {e}")
 
     def delete_user_from_db(json_data):
-        query = "SELECT id FROM telegram_users WHERE user_id = ?"
-        RequestHandler._database.cursor.execute(query, (json_data['user_id'],))
-        user_db_id = RequestHandler._database.cursor.fetchone()[0]
-        if user_db_id:
-            query = "DELETE FROM user_categories WHERE user_id = ?"
-            RequestHandler._database.cursor.execute(query, (user_db_id,))
-            query = "DELETE FROM telegram_users WHERE id = ?"
-            RequestHandler._database.cursor.execute(query, (user_db_id,))
-            RequestHandler._database.conn.commit()
+        try:
+            query = "SELECT id FROM telegram_users WHERE user_id = ?"
+            RequestHandler._database.cursor.execute(query, (json_data['user_id'],))
+            result = RequestHandler._database.cursor.fetchone()
+            if result:
+                user_db_id = result[0]
+
+                query = "DELETE FROM user_categories WHERE user_id = ?"
+                RequestHandler._database.cursor.execute(query, (user_db_id,))
+                query = "DELETE FROM telegram_users WHERE id = ?"
+                RequestHandler._database.cursor.execute(query, (user_db_id,))
+
+                RequestHandler._database.conn.commit()
+            else:
+                pass
+
+        except Exception as e:
+            print(f"Error when deleting a user from the database: {e}")
