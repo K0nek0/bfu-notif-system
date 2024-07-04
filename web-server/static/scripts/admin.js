@@ -23,7 +23,7 @@ const renderTable = () => {
   tableBody.setAttribute('id', 'table-body');
 
   tHead.after(tableBody);
-  list.forEach((item) => {
+  notificationList.forEach((item) => {
     const iconBtn = document.createElement('button');
     iconBtn.innerHTML = 'delete';
     iconBtn.setAttribute('id', 'delete');
