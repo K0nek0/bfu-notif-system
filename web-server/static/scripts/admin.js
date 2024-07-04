@@ -1,10 +1,4 @@
 let notificationList = [];
-// Объект для сопоставления category_id и текстовых значений
-const categoryMap = {
-  'Важное': 1,
-  'Мероприятие': 2,
-  'Учёба': 3,
-};
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
@@ -17,6 +11,13 @@ const formatDate = (date) => {
 
   console.log(day);
   return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
+};
+
+// Объект для сопоставления category_id и текстовых значений
+const categoryMap = {
+  1: 'Важное',
+  2: 'Мероприятие',
+  3: 'Учёба',
 };
 
 // Функция отрисовки списка
@@ -74,7 +75,11 @@ const renderTable = () => {
     });
   });
 };
-
+const categoryMap = {
+  'Важное': 1,
+  'Мероприятие': 2,
+  'Учёба': 3,
+};
 // Событие создания новой нотификации
 const form = document.querySelector('#form');
 form.addEventListener('submit', async (e) => {
