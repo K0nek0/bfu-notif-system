@@ -108,6 +108,10 @@ form.addEventListener('submit', async (e) => {
   description.value = '';
   datetime.value = '';
   category.value = '';
+  // Обновление страницы
+  setTimeout(() => {
+    window.location.reload();
+  }, 1000); // Задержка для отображения сообщения об успехе
 });
 
 // Запрос на список при входе на страницу
