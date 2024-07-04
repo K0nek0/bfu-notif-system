@@ -3,6 +3,7 @@ from telebot import types
 import socket
 import json
 import threading
+from datetime import datetime
 
 with open('credentials.TXT', 'r') as file:
     bot_token = file.read().strip()
@@ -15,12 +16,41 @@ SERVER_HOST = '109.111.157.159'
 SERVER_PORT = 8001
 
 client_socket = None
+target_users = []
+
 
 def socket_client():
     global client_socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((SERVER_HOST, SERVER_PORT))
     print(f"Connected to server at {SERVER_HOST}:{SERVER_PORT}")
+
+    while True:
+        try:
+            data = client_socket.recv(1024)
+            if data:
+                json_data = data.decode('utf-8')
+                data_dict = json.loads(json_data)
+                print(f"Received from server: {data_dict}")
+
+
+                category_id = int(data_dict.get('category_id', 0))
+                if category_id == 1:
+                    data_dict['category_id'] = 'Важное'
+                elif category_id == 2:
+                    data_dict['category_id'] = 'Мероприятие'
+                elif category_id == 3:
+                    data_dict['category_id'] = 'Обучение'
+
+                target_users.append(data_dict)
+                print(target_users)
+            else:
+                print("No data received, closing connection")
+                break
+        except Exception as e:
+            print(f"Error receiving data: {e}")
+            break
+
 
 def send_data_to_server(data):
     try:
@@ -35,18 +65,11 @@ def send_data_to_server(data):
             print(f"Unsupported data type: {type(data)}")
             return "Unsupported data type"
 
-        response = client_socket.recv(1024)
-        if not response:
-            return "No response from server"
-        response_data = response.decode('utf-8')
-        print(f"Received from server: {response_data}")
-        return response_data
     except ConnectionRefusedError:
         return "Could not connect to server"
     except TimeoutError:
         return "Connection timed out"
-    # except json.JSONDecodeError:
-    #     return {"status": "error", "message": "Invalid response from server"}
+
 
 def create_keyboard():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -60,16 +83,18 @@ def create_keyboard():
     markup.row(help_btn)
     return markup
 
+
 def create_categories():
     markup2 = types.ReplyKeyboardMarkup(resize_keyboard=True)
     imp = types.KeyboardButton('Важное')
-    event = types.KeyboardButton('Развлекательное')
+    event = types.KeyboardButton('Мероприятие')
     study = types.KeyboardButton('Обучение')
     back = types.KeyboardButton('Назад')
     markup2.row(imp, study)
     markup2.row(event)
     markup2.row(back)
     return markup2
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -87,15 +112,18 @@ def start(message):
                                       'Остальные команды доступны в /help',
                      parse_mode='Markdown', reply_markup=markup)
 
+
 @bot.message_handler(commands=['sub'])
 def subscribe(message):
     bot.send_message(message.chat.id, 'Выберите категорию:', reply_markup=create_categories())
+
 
 @bot.message_handler(func=lambda message: message.text == 'Назад')
 def back(message):
     bot.send_message(message.chat.id, 'Вы в главном меню!', reply_markup=create_keyboard())
 
-@bot.message_handler(func=lambda message: message.text in ['Важное', 'Развлекательное', 'Обучение'])
+
+@bot.message_handler(func=lambda message: message.text in ['Важное', 'Мероприятие', 'Обучение'])
 def category_sub(message):
     category = message.text
     bot.send_message(message.chat.id, f'Вы успешно подписались на {category}!',
@@ -105,6 +133,7 @@ def category_sub(message):
         "category": category
     }
     send_data_to_server(person)
+
 
 @bot.message_handler(commands=['unsub'])
 def unsubscribe(message):
@@ -117,17 +146,63 @@ def unsubscribe(message):
 
     send_data_to_server(person)
 
+
 @bot.message_handler(commands=['help'])
 def help_command(message):
     bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
 
+
 @bot.message_handler(commands=['recent'])
-def recent_event(message):
-    bot.send_message(message.chat.id, 'recent_event', reply_markup=create_keyboard())
+def recent_handler(message):
+    event_details = recent_event(target_users)
+    if event_details:
+        response_message = (f"Последнее событие:\n"
+                            f"Заголовок: {event_details['title']}\n"
+                            f"Описание: {event_details['description']}\n"
+                            f"Время события: {event_details['event_time']}\n"
+                            f"Категория: {event_details['category_id']}")
+    else:
+        response_message = "Нет событий, произошедших до текущего времени"
+
+    bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
+
+def recent_event(target_users):
+    max_event_datetime = None
+    recent_event_details = None
+
+    for item in target_users:
+        event_time = item.get("event_time")
+        event_datetime = datetime.strptime(event_time, '%Y-%m-%dT%H:%M')  # Преобразуем строку в datetime
+        recent_event_details = item
+
+        if event_datetime <= datetime.now():
+            if max_event_datetime is None or event_datetime > max_event_datetime:
+                max_event_datetime = event_datetime
+                recent_event_details = item
+
+    return recent_event_details
+
+
+@bot.message_handler(func=lambda message: message.text == 'Последнее событие')
+def recent_handler(message):
+    event_details = recent_event(target_users)
+    if event_details:
+        response_message = (f"Последнее событие:\n"
+                            f"Заголовок: {event_details['title']}\n"
+                            f"Описание: {event_details['description']}\n"
+                            f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
+                            f"Категория: {event_details['category_id']}")
+    else:
+        response_message = "Нет событий, произошедших до текущего времени"
+
+    bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
+
+
 
 @bot.message_handler(commands=['upcoming'])
 def upcoming_events(message):
     bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
+
 
 @bot.message_handler(func=lambda message: message.text == 'Отписаться')
 def unsub(message):
@@ -139,7 +214,7 @@ def unsub(message):
     }
 
     response = send_data_to_server(person)
-    # print(f"Response from server: {response}")
+
 
 @bot.message_handler(
     func=lambda message: message.text in ['Подписаться', 'Список команд', 'Последнее событие', 'Предстоящие события'])
@@ -153,10 +228,6 @@ def on_click(message):
             'text': f'Список команд:\n{command_list}',
             'markup': create_keyboard
         },
-        'Последнее событие': {
-            'text': "recent_event",
-            'markup': create_keyboard
-        },
         'Предстоящие события': {
             'text': "upcoming_events",
             'markup': create_keyboard
@@ -165,10 +236,12 @@ def on_click(message):
     replyDict = msgTextDict[message.text]
     bot.send_message(message.chat.id, replyDict['text'], reply_markup=replyDict['markup']())
 
+
 @bot.message_handler()
 def error(message):
     bot.send_message(message.chat.id, 'Неизвестная команда, используйте /help, чтобы вывести список команд',
                      parse_mode='Markdown', reply_markup=create_keyboard())
+
 
 if __name__ == '__main__':
     socket_thread = threading.Thread(target=socket_client, daemon=True)
