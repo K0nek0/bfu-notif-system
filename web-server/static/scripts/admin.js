@@ -11,7 +11,6 @@ const formatDate = (date) => {
   const time = `${dateTime.getHours()}:${dateTime.getMinutes()}`;
 
   console.log(day);
-
   return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
 };
 
@@ -37,11 +36,9 @@ const renderTable = (list) => {
     const thDateTime = document.createElement('th');
     const thDelete = document.createElement('th');
 
-    // thTitle.setAttribute('style', `color: ${item.color}`);
-
     thTitle.innerHTML = item.title;
     thDescription.innerHTML = item.description || '';
-    thDateTime.innerHTML = formatDate(item.datetime);
+    thDateTime.innerHTML = formatDate(item.event_time);
     thDelete.append(iconBtn);
 
     tableBody.append(tr);
@@ -52,13 +49,7 @@ const renderTable = (list) => {
 
     // Событие удаления
     iconBtn.addEventListener('click', async () => {
-      //КАК СЕЙЧАС
-      // const newList = await fetch(`${SERVER}/delete`)
-      //   .then((res) => res.json())
-      //   .then((res) => res);
-
-      // ТО КАК ДОЛЖНО БЫТЬ
-      const newList = await fetch(`${SERVER}/notification`, {
+      const newList = await fetch(`${SERVER}delete_event`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
@@ -67,8 +58,8 @@ const renderTable = (list) => {
           id: item.id,
         }),
       })
-        .then((res) => res.json())
-        .then((res) => res);
+          .then((res) => res.json())
+          .then((res) => res);
 
       renderTable(newList);
     });
@@ -88,26 +79,19 @@ form.addEventListener('submit', async (e) => {
   const notification = {
     title: title.value,
     description: description.value || '',
-    datetime: datetime.value,
+    event_time: datetime.value,
     category: category.value,
   };
-  console.log('Уведомление: ', notification);
 
-  // ВРЕМЕННО ИЗ-ЗА СЕРВЕРА
-  // const newList = await fetch(`${SERVER}/newElement`)
-  //   .then((res) => res.json())
-  //   .then((res) => res);
-
-  // ТО КАК ДОЛЖНО БЫТЬ
-  const newList = await fetch(`${SERVER}/notification`, {
+  const newList = await fetch(`${SERVER}new_event`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
     },
     body: JSON.stringify(notification),
   })
-    .then((res) => res.json())
-    .then((res) => res);
+      .then((res) => res.json())
+      .then((res) => res);
 
   const successText = document.createElement('p');
   successText.innerHTML = 'Заявление успешно создано';
@@ -127,17 +111,18 @@ form.addEventListener('submit', async (e) => {
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
-  const notificationList = await fetch(`${SERVER}/notification`)
+  const notificationList = await fetch(`${SERVER}events`)
       .then((res) => res.json())
       .then((res) => res);
 
   renderTable(notificationList);
 });
-const dataTime = document.getElementById("datetime")
+
+const dataTime = document.getElementById("datetime");
 dataTime.min = new Date().toISOString().slice(0, -8);
-setInterval(()=>{
+setInterval(() => {
   dataTime.min = new Date().toISOString().slice(0, -8);
-}, 10000)
+}, 10000);
 
 document.addEventListener("DOMContentLoaded", function() {
   const textarea = document.getElementById("description");
