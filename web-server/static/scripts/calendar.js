@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", async event => {
         const detailsCards = document.createElement("div")
         detailsCards.className = "calendar-details-cards"
         
-        let dateEvents = getEventsByDate(date)
+        let dateEvents = getEventsByDate(selectedDate)
         for(let i = 0; i < dateEvents.length; i++) {
             let selectedEvent = dateEvents[i]
             let displayCard = createEventCard(selectedEvent.title, selectedEvent.description, selectedEvent.event_time, selectedEvent.category)
