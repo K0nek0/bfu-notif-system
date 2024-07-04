@@ -96,7 +96,7 @@ form.addEventListener('submit', async (e) => {
     title: title.value,
     description: description.value || '',
     event_time: datetime.value,
-    category_id: category_id,
+    category_id: category_id.value,
   };
 
   await fetch(`/new_event`, {
