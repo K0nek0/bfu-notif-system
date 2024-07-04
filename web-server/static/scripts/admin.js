@@ -38,6 +38,7 @@ const renderTable = () => {
 
     thTitle.innerHTML = item.title;
     thDescription.innerHTML = item.description || '';
+    thDescription.classList.add('description');
     thDateTime.innerHTML = formatDate(item.event_time);
     thCategory.innerHTML = item.category;
     thDelete.append(iconBtn);
@@ -63,7 +64,7 @@ const renderTable = () => {
           .then((res) => res.json())
           .then((res) => res);
 
-      fetchEvents();
+      await fetchEvents();
     });
   });
 };
@@ -95,7 +96,6 @@ form.addEventListener('submit', async (e) => {
       .then((res) => res.json())
       .then((res) => res);
 
-
   const successText = document.createElement('p');
   successText.innerHTML = 'Заявление успешно создано';
   form.querySelector('.form-submit').append(successText);
@@ -104,7 +104,7 @@ form.addEventListener('submit', async (e) => {
     successText.remove();
   }, 1500);
 
-  fetchEvents();
+  await fetchEvents();
 
   title.value = '';
   description.value = '';
@@ -122,7 +122,7 @@ const fetchEvents = async function() {
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
-  fetchEvents();
+  await fetchEvents();
 });
 
 const dataTime = document.getElementById("datetime");

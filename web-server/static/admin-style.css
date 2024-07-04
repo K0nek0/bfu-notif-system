@@ -114,6 +114,13 @@ table td:last-child {
   text-align: center;
 }
 
+table th.description,
+table td.description {
+  max-width: 200px; /* Adjust as needed */
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 @media (max-width: 600px) {
   .calendar-block {
     padding: 10px;
