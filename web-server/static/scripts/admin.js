@@ -37,12 +37,12 @@ const renderTable = (list) => {
     thTitle.innerHTML = item.title;
     thDescription.innerHTML = item.description || '';
     thDateTime.innerHTML = formatDate(item.event_time);
-    thCategory.innerHTML = item.category;
+    // thCategory.innerHTML = item.category;
     thDelete.append(iconBtn);
 
     tableBody.append(tr);
     tr.append(thTitle);
-    tr.append(thCategory);
+    // tr.append(thCategory);
     tr.append(thDateTime);
     tr.append(thDescription);
     tr.append(thDelete);
