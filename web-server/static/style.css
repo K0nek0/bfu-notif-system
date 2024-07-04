@@ -256,6 +256,7 @@ nav div {
 }
 .event-text-container .event-text {
     margin: 5px 15px;
+    word-break: break-all;
 }
 .event-card:hover > .event-text-container {
     height: 100%;
