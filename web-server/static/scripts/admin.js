@@ -40,7 +40,7 @@ const renderTable = () => {
     thDescription.innerHTML = item.description || '';
     thDescription.classList.add('description');
     thDateTime.innerHTML = formatDate(item.event_time);
-    thCategory.innerHTML = item.category;
+    thCategory.innerHTML = item.category_id;
     thDelete.append(iconBtn);
 
     tableBody.append(tr);
@@ -77,13 +77,13 @@ form.addEventListener('submit', async (e) => {
   const title = form.querySelector('#title');
   const description = form.querySelector('#description');
   const datetime = form.querySelector('#datetime');
-  const category = form.querySelector('#category_id');
+  const category_id = form.querySelector('#category_id');
 
   const notification = {
     title: title.value,
     description: description.value || '',
     event_time: datetime.value,
-    category: category.value,
+    category_id: category_id.value,
   };
 
   await fetch(`/new_event`, {
@@ -109,7 +109,7 @@ form.addEventListener('submit', async (e) => {
   title.value = '';
   description.value = '';
   datetime.value = '';
-  category.value = '';
+  category_id.value = '';
 });
 
 const fetchEvents = async function() {
