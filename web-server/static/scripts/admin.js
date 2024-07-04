@@ -1,4 +1,10 @@
 let notificationList = [];
+// Объект для сопоставления category_id и текстовых значений
+const categoryMap = {
+  'Важное': 1,
+  'Мероприятие': 2,
+  'Учёба': 3,
+};
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
@@ -11,13 +17,6 @@ const formatDate = (date) => {
 
   console.log(day);
   return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
-};
-
-// Объект для сопоставления category_id и текстовых значений
-const categoryMap = {
-  1: 'Важное',
-  2: 'Мероприятие',
-  3: 'Учёба',
 };
 
 // Функция отрисовки списка
@@ -84,13 +83,15 @@ form.addEventListener('submit', async (e) => {
   const title = form.querySelector('#title');
   const description = form.querySelector('#description');
   const datetime = form.querySelector('#datetime');
-  const category = form.nodeType
+  const category = form.querySelector('#category');
+
+  const category_id = categoryMap[category.value];
 
   const notification = {
     title: title.value,
     description: description.value || '',
     event_time: datetime.value,
-    category_id: category.value,
+    category_id: category_id,
   };
 
   await fetch(`/new_event`, {
@@ -100,20 +101,8 @@ form.addEventListener('submit', async (e) => {
     },
     body: JSON.stringify(notification),
   })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      })
-      .then((res) => {
-        console.log('Успешно создано', res);
-        fetchEvents(); // Перезагрузка списка событий
-      })
-      .catch((error) => {
-        console.error('Ошибка при создании события:', error);
-        alert('Произошла ошибка при создании события. Пожалуйста, попробуйте ещё раз.');
-      });
+      .then((res) => res.json())
+      .then((res) => res);
 
   const successText = document.createElement('p');
   successText.innerHTML = 'Заявление успешно создано';
@@ -128,7 +117,7 @@ form.addEventListener('submit', async (e) => {
   title.value = '';
   description.value = '';
   datetime.value = '';
-  // category.value = '';
+  category.value = '';
 });
 
 const fetchEvents = async function() {
