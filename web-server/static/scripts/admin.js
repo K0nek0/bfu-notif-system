@@ -1,3 +1,4 @@
+let notificationList = []
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
@@ -13,7 +14,7 @@ const formatDate = (date) => {
 };
 
 // Функция отрисовки списка
-const renderTable = (list) => {
+const renderTable = () => {
   const tHead = document.querySelector('#table-head');
   const tBody = document.querySelector('#table-body');
   tBody.remove();
@@ -50,7 +51,7 @@ const renderTable = (list) => {
 
     // Событие удаления
     iconBtn.addEventListener('click', async () => {
-      const newList = await fetch(`/delete_event`, {
+      await fetch(`/delete_event`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
@@ -62,7 +63,7 @@ const renderTable = (list) => {
           .then((res) => res.json())
           .then((res) => res);
 
-      renderTable(newList);
+      fetchEvents();
     });
   });
 };
@@ -84,7 +85,7 @@ form.addEventListener('submit', async (e) => {
     category: category.value,
   };
 
-  const newList = await fetch(`/new_event`, {
+  await fetch(`/new_event`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -94,6 +95,7 @@ form.addEventListener('submit', async (e) => {
       .then((res) => res.json())
       .then((res) => res);
 
+
   const successText = document.createElement('p');
   successText.innerHTML = 'Заявление успешно создано';
   form.querySelector('.form-submit').append(successText);
@@ -102,25 +104,25 @@ form.addEventListener('submit', async (e) => {
     successText.remove();
   }, 1500);
 
-  renderTable(newList);
+  fetchEvents();
 
   title.value = '';
   description.value = '';
   datetime.value = '';
   category.value = '';
-  // Обновление страницы
-  setTimeout(() => {
-    window.location.reload();
-  }, 1000); // Задержка для отображения сообщения об успехе
 });
 
-// Запрос на список при входе на страницу
-document.addEventListener('DOMContentLoaded', async () => {
-  const notificationList = await fetch('/events')
+const fetchEvents = async function() {
+  notificationList = await fetch('/events')
       .then((res) => res.json())
       .then((res) => res);
 
-  renderTable(notificationList);
+  renderTable();
+}
+
+// Запрос на список при входе на страницу
+document.addEventListener('DOMContentLoaded', async () => {
+  fetchEvents();
 });
 
 const dataTime = document.getElementById("datetime");
