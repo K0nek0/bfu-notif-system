@@ -80,6 +80,7 @@ const categoryMap1 = {
   'Мероприятие': 2,
   'Учёба': 3,
 };
+
 // Событие создания новой нотификации
 const form = document.querySelector('#form');
 form.addEventListener('submit', async (e) => {
