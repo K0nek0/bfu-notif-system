@@ -100,8 +100,20 @@ form.addEventListener('submit', async (e) => {
     },
     body: JSON.stringify(notification),
   })
-      .then((res) => res.json())
-      .then((res) => res);
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      })
+      .then((res) => {
+        console.log('Успешно создано', res);
+        fetchEvents(); // Перезагрузка списка событий
+      })
+      .catch((error) => {
+        console.error('Ошибка при создании события:', error);
+        alert('Произошла ошибка при создании события. Пожалуйста, попробуйте ещё раз.');
+      });
 
   const successText = document.createElement('p');
   successText.innerHTML = 'Заявление успешно создано';
@@ -116,7 +128,7 @@ form.addEventListener('submit', async (e) => {
   title.value = '';
   description.value = '';
   datetime.value = '';
-  category.value = '';
+  // category.value = '';
 });
 
 const fetchEvents = async function() {
