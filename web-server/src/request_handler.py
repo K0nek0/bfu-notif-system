@@ -5,10 +5,15 @@ import os
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
     _database = None
+    _socket_clients = []
 
     @classmethod
     def connect_database(cls, database):
         cls._database = database
+
+    @staticmethod
+    def add_socket_client(client_socket):
+        RequestHandler._socket_clients.append(client_socket)
 
     def do_GET(self):
         if self.path == '/':
@@ -120,12 +125,16 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     event_data['category_id'],
                     event_data['event_time']
                 ))
+                event_id = RequestHandler._database.cursor.lastrowid
                 RequestHandler._database.conn.commit()
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"status": "success"}).encode())
+
+                self.notify_users_of_event(event_id)
+
             except Exception as e:
                 self.send_error(500, f"Database error: {str(e)}")
         else:
@@ -157,6 +166,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_error(500, "Database not connected")
 
+    @staticmethod
     def add_user_to_db(json_data):
         try:
             query = "INSERT OR IGNORE INTO telegram_users (user_id) VALUES (?)"
@@ -178,6 +188,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             print(f"Error when adding a user to the database: {e}")
 
+    @staticmethod
     def delete_user_from_db(json_data):
         try:
             query = "SELECT id FROM telegram_users WHERE user_id = ?"
@@ -197,3 +208,42 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
         except Exception as e:
             print(f"Error when deleting a user from the database: {e}")
+
+    def notify_users_of_event(self, event_id):
+        if RequestHandler._database:
+            try:
+                query = """
+                    SELECT DISTINCT u.user_id
+                    FROM user_categories uc
+                    JOIN telegram_users u ON u.id = uc.user_id
+                    WHERE uc.category_id = (SELECT category_id FROM events WHERE id = ?)
+                """
+                RequestHandler._database.cursor.execute(query, (event_id,))
+                users = RequestHandler._database.cursor.fetchall()
+
+                query_event = "SELECT * FROM events WHERE id = ?"
+                RequestHandler._database.cursor.execute(query_event, (event_id,))
+                event_data = RequestHandler._database.cursor.fetchone()
+
+                for user in users:
+                    user_id = user[0]
+                    self.send_data_to_socket_clients(user_id, event_data)
+
+            except Exception as e:
+                print(f"Error notifying users of event: {e}")
+        else:
+            print("Database not connected")
+
+    def send_data_to_socket_clients(self, user_id, event_data):
+        for client in RequestHandler._socket_clients:
+            try:
+                notification = {
+                    "user_id": user_id,
+                    "title": event_data[1],
+                    "description": event_data[2],
+                    "category_id": event_data[3],
+                    "event_time": event_data[5]
+                }
+                client.sendall(json.dumps(notification).encode('utf-8'))
+            except Exception as e:
+                print(f"Error sending data to socket client: {e}")
