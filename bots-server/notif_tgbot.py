@@ -22,15 +22,13 @@ def socket_client():
     client_socket.connect((SERVER_HOST, SERVER_PORT))
     print(f"Connected to server at {SERVER_HOST}:{SERVER_PORT}")
 
-
-
 def send_data_to_server(data):
     try:
         if isinstance(data, dict):
             json_data = json.dumps(data, ensure_ascii=False)
             print(f"Sending to server: {json_data}")
             client_socket.sendall(json_data.encode('utf-8'))
-        elif isinstance(data, str):  # Пример отправки строки
+        elif isinstance(data, str):
             print(f"Sending string to server: {data}")
             client_socket.sendall(data.encode('utf-8'))
         else:
