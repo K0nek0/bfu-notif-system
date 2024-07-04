@@ -75,7 +75,7 @@ const renderTable = () => {
     });
   });
 };
-const categoryMap = {
+const categoryMap1 = {
   'Важное': 1,
   'Мероприятие': 2,
   'Учёба': 3,
@@ -90,7 +90,7 @@ form.addEventListener('submit', async (e) => {
   const datetime = form.querySelector('#datetime');
   const category = form.querySelector('#category');
 
-  const category_id = categoryMap[category.value];
+  const category_id = categoryMap1[category.value];
 
   const notification = {
     title: title.value,
