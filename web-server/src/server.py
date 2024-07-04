@@ -37,11 +37,7 @@ def handle_socket_client(conn, addr):
 
             try:
                 json_data = json.loads(buffer.decode('utf-8'))
-                print(json_data)
-                if 'title' in json_data:
-                    handler.add_event_to_db(json_data)
-                    conn.sendall(b"Data received and added to database")
-                elif 'category' in json_data:
+                if 'category' in json_data:
                     handler.add_user_to_db(json_data)
                     conn.sendall(b"Data received and added to database")
                 elif 'delete' in json_data:

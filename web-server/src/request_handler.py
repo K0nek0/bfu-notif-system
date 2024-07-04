@@ -62,7 +62,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     "id": row[0],
                     "title": row[1],
                     "description": row[2],
-                    "category": row[3],
+                    "category_id": row[3],
                     "created_at": row[4],
                     "event_time": row[5]
                 } for row in events]
@@ -92,7 +92,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     "id": row[0],
                     "title": row[1],
                     "description": row[2],
-                    "category": row[3],
+                    "category_id": row[3],
                     "created_at": row[4],
                     "event_time": row[5]
                 } for row in events]
@@ -113,11 +113,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
         if RequestHandler._database:
             try:
-                query = "INSERT INTO events (title, description, category, event_time) VALUES (?, ?, ?, ?)"
+                query = "INSERT INTO events (title, description, category_id, event_time) VALUES (?, ?, ?, ?)"
                 RequestHandler._database.cursor.execute(query, (
                     event_data['title'],
                     event_data['description'],
-                    event_data['category'],
+                    event_data['category_id'],
                     event_data['event_time']
                 ))
                 RequestHandler._database.conn.commit()
