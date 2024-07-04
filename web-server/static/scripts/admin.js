@@ -105,11 +105,13 @@ form.addEventListener('submit', async (e) => {
   description.value = '';
   datetime.value = '';
   category.value = '';
+
+  window.location.reload();
 });
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
-  const notificationList = await fetch(`/events`)
+  const notificationList = await fetch('/events')
       .then((res) => res.json())
       .then((res) => res);
 
