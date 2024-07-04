@@ -1,5 +1,3 @@
-const SERVER = 'http://127.0.0.1:8000/';
-
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
@@ -49,7 +47,7 @@ const renderTable = (list) => {
 
     // Событие удаления
     iconBtn.addEventListener('click', async () => {
-      const newList = await fetch(`${SERVER}delete_event`, {
+      const newList = await fetch(`/delete_event`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
@@ -83,7 +81,7 @@ form.addEventListener('submit', async (e) => {
     category: category.value,
   };
 
-  const newList = await fetch(`${SERVER}new_event`, {
+  const newList = await fetch(`/new_event`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -111,7 +109,7 @@ form.addEventListener('submit', async (e) => {
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
-  const notificationList = await fetch(`${SERVER}events`)
+  const notificationList = await fetch(`/events`)
       .then((res) => res.json())
       .then((res) => res);
 
