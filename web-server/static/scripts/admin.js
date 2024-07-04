@@ -13,11 +13,11 @@ const formatDate = (date) => {
   return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
 };
 
-// Объект для сопоставления tag и текстовых значений категорий
+// Объект для сопоставления category_id и текстовых значений
 const categoryMap = {
-  activity: 'Мероприятие',
-  study: 'Учёба',
-  important: 'Важное',
+  1: 'Важное',
+  2: 'Мероприятие',
+  3: 'Учёба',
 };
 
 // Функция отрисовки списка
@@ -47,7 +47,7 @@ const renderTable = () => {
     thDescription.innerHTML = item.description || '';
     thDescription.classList.add('description');
     thDateTime.innerHTML = formatDate(item.event_time);
-    thCategory.innerHTML = categoryMap[item.tag] || 'Неизвестная категория';
+    thCategory.innerHTML = categoryMap[item.category_id] || 'Неизвестная категория';
     thDelete.append(iconBtn);
 
     tableBody.append(tr);
@@ -84,13 +84,13 @@ form.addEventListener('submit', async (e) => {
   const title = form.querySelector('#title');
   const description = form.querySelector('#description');
   const datetime = form.querySelector('#datetime');
-  const category = form.querySelector('#category');
+  const category = form.nodeType
 
   const notification = {
     title: title.value,
     description: description.value || '',
     event_time: datetime.value,
-    tag: category.value,
+    category_id: category.value,
   };
 
   await fetch(`/new_event`, {
@@ -119,13 +119,13 @@ form.addEventListener('submit', async (e) => {
   category.value = '';
 });
 
-const fetchEvents = async function () {
+const fetchEvents = async function() {
   notificationList = await fetch('/events')
       .then((res) => res.json())
       .then((res) => res);
 
   renderTable();
-};
+}
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
