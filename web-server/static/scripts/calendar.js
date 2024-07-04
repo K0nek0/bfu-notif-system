@@ -298,6 +298,11 @@ document.addEventListener("DOMContentLoaded", async event => {
             let displayCard = createEventCard(selectedEvent.title, selectedEvent.description, selectedEvent.event_time, selectedEvent.category)
             detailsCards.append(displayCard)
         }
+        if(dateEvents.length == 0) { // Add "Events empty" caption
+            const emptyMessage = document.createElement("span")
+            emptyMessage.textContent = "На эту дату не назначено событий"
+            detailsCards.append(emptyMessage)
+        }
         detailsContent.append(detailsCards)
 
         detailBar.innerHTML = ""

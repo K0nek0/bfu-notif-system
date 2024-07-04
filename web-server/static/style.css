@@ -455,6 +455,10 @@ nav div {
     justify-content: space-around;
     overflow: auto;
 }
+.calendar-details-cards span {
+    color :#9a9a9a;
+    font-size: 20px;
+}
 .calendar-details-cards::-webkit-scrollbar {
     width: 7px;
 }
