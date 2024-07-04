@@ -17,7 +17,7 @@ const formatDate = (date) => {
 const categoryMap = {
   1: 'Важное',
   2: 'Мероприятие',
-  3: 'Учёба',
+  3: 'Обучение',
 };
 
 // Функция отрисовки списка
@@ -78,7 +78,7 @@ const renderTable = () => {
 const categoryMap1 = {
   'Важное': '1',
   'Мероприятие': '2',
-  'Учёба': '3',
+  'Обучение': '3',
 };
 
 // Событие создания новой нотификации
@@ -97,7 +97,7 @@ form.addEventListener('submit', async (e) => {
     title: title.value,
     description: description.value || '',
     event_time: datetime.value,
-    category_id: category_id.value,
+    category_id: category_id,
   };
 
   await fetch(`/new_event`, {
