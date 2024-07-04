@@ -458,6 +458,7 @@ nav div {
 .calendar-details-cards span {
     color :#9a9a9a;
     font-size: 20px;
+    align-self: center;
 }
 .calendar-details-cards::-webkit-scrollbar {
     width: 7px;
