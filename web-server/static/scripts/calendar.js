@@ -1,4 +1,39 @@
 document.addEventListener("DOMContentLoaded", async event => {
+    // Fetch data from sever
+    let eventsArray = []
+    let millisecondsInDay = 24 * 60 * 60 * 1000
+
+    function getAllEvents() {
+        return new Promise((resolve, reject) => {
+            fetch("/events").then(async response => {
+                if(response.status == 200) eventsArray = await response.json()
+                resolve(eventsArray)
+            }).catch(err => {
+                reject(err)
+            })
+        })
+    }
+
+    function getRecentEvents() {
+        let result = []
+        let nowTime = new Date().getTime()
+        for(let i = 0; i < eventsArray.length; i++) {
+            let eventTime = new Date(eventsArray[i].event_time).getTime() // Formatting to Date in case we got string instead of timestamp
+            if(eventTime - nowTime <= millisecondsInDay) result.push(eventsArray[i])
+        }
+        return result
+    }
+
+    function getEventsByDate(date) {
+        let resArray = []
+        for(let i = 0; i < eventsArray.length; i++) {
+            let eventDate = new Date(eventsArray[i].event_time)
+            if(date.toDateString() == eventDate.toDateString()) resArray.push(eventsArray[i])
+            else console.log(date.toDateString(), eventDate.toDateString())
+        }
+        return resArray
+    }
+
     // EMAIL SUB MODAL SCRIPT
     const modal = document.getElementById("email-sub-modal")
     const modalForm = document.getElementById("email-sub-form")
@@ -41,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async event => {
             setTimeout(() => {
                 hideEmailModal()
             }, 3000)
-        }).catch(error => showEmailSubmitError("Не удалось подписаться. Попробуйте позже"))
+        }).catch(() => showEmailSubmitError("Не удалось подписаться. Попробуйте позже"))
     })
 
     // EVENTS CARDS SCRIPT
@@ -133,54 +168,18 @@ document.addEventListener("DOMContentLoaded", async event => {
         return card
     }
 
-    const fetchRecentEvents = async function() {
-        //let data = await fetch()        
-        return [
-            {
-                id: "321843249",
-                title: "Перенос экзамена для группы 4 АДМО (2 курс)",
-                text: "Внимание студентов 2 курса 4 группы АДМО! Экзамен по дисциплине Математический анализ (преподаватель Семёнов В.И.) переносится с 8:30 на 10:10\nПродолжительность экзамена осталась неизменной - 5 часов",
-                category: "study",
-                created_at: new Date().getTime() - 1000000,
-                event_time: new Date().getTime() + 300000
-            },
-            {
-                id: "321843250",
-                title: "День физмата",
-                text: "Завтра пройдёт день физмата. Почему так поздно? Ну, проект делается именно в такое время, поэтому приходится импровизировать. Конечно же, мы могли провести не день физмата, а что-то иное, но нам эта идея показалась странной\nКстати, в тексте оповещения можно использовать <b>HTML разметку</b>!\nЖдём на дне физмата всех учащихся и преподавателей. Приходите!\nДобавим ещё немного текста, чтобы это сообщение можно было листать вверх и вниз. Не зря ведь переделывался скорлл бар, верно?",
-                category: "event",
-                created_at: new Date().getTime() - 1100000,
-                event_time: new Date().getTime() + 1010500
-            },
-        ]
-    }
-
     // CALENDAR SCRIPT
-    const events = {
-        
-    } // key:value = monthNumber:[{title,description,timestamp,category}]
-    async function fecthAllEvents() {
-        let data = await fetch("/events_all").then(response => {
-            if(response.status == 200) return response.json()
-        }).catch(err => {
-            // TODO Handle connect error
-        })
-        return []
-    }
-
     const refreshBtn = document.getElementById("refresh")
     let refreshClicked = false
-    refreshBtn.addEventListener("click", () => {
+    refreshBtn.addEventListener("click", async () => {
         if(refreshClicked) return
         refreshBtn.style.animation = "refresh-rotate 1s infinite"
         refreshClicked = true
-        // TODO Do some sync stuff
-        
-        // Temporary anim solution
-        setTimeout(() => {
-            refreshBtn.style.animation = "none"
-            refreshClicked = false
-        }, 2000)
+
+        await getAllEvents()
+
+        refreshBtn.style.animation = "none"
+        refreshClicked = false
     })
 
     const calendar = document.getElementById("calendar")
@@ -203,8 +202,6 @@ document.addEventListener("DOMContentLoaded", async event => {
         currentMonthText.textContent = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`
         currentCalendar = {month, year}
         
-        let millisecondsInDay = 24 * 60 * 60 * 1000
-
         // Works like offset for previous month in calendar
         let monthStartDay = monthStart.getDay() - 1
         if(monthStartDay == -1) monthStartDay = 6
@@ -221,8 +218,9 @@ document.addEventListener("DOMContentLoaded", async event => {
             else cell.classList.remove("current-date")
 
             cell.children.item(0).textContent = currentCellDate.getDate()
-            cell.children.item(1).textContent = "" // TODO Make server sync
-            //cell.setAttribute("data-datestr", currentCellDate.toLocaleDateString("ru-RU"))
+            
+            let dayEvents = getEventsByDate(currentCellDate) 
+            cell.children.item(1).textContent = dayEvents.length
             cell.setAttribute("data-datestr", currentCellDate.toISOString())
 
             currentCellDate.setTime(currentCellDate.getTime() + millisecondsInDay)
@@ -276,7 +274,6 @@ document.addEventListener("DOMContentLoaded", async event => {
 
 
     function setDateDetails(date, detailBar) {
-        //let [day, month, year] = date.split(".")
         let selectedDate = new Date(date)
         let selectedMonth = selectedDate.toLocaleString('ru', {
             month: 'long',
@@ -302,9 +299,11 @@ document.addEventListener("DOMContentLoaded", async event => {
 
         const detailsCards = document.createElement("div")
         detailsCards.className = "calendar-details-cards"
-        // TODO Use fetched data
-        for(let i = 0; i < 4; i++) {
-            let displayCard = createEventCard("Hello, world!", "Some text goes here", new Date().getTime() + 300000, "event")
+        
+        let dateEvents = getEventsByDate(date)
+        for(let i = 0; i < dateEvents.length; i++) {
+            let selectedEvent = dateEvents[i]
+            let displayCard = createEventCard(selectedEvent.title, selectedEvent.description, selectedEvent.event_time, selectedEvent.category)
             detailsCards.append(displayCard)
         }
         detailsContent.append(detailsCards)
@@ -334,7 +333,6 @@ document.addEventListener("DOMContentLoaded", async event => {
             }, {once: true})
         }
         detailBar.setAttribute("data-showing", cell.getAttribute("data-datestr"))
-        //detailBar.textContent = cell.getAttribute("data-datestr")
         setDateDetails(cell.getAttribute("data-datestr"), detailBar)
     }
 
@@ -374,17 +372,17 @@ document.addEventListener("DOMContentLoaded", async event => {
             }
         }
     }
-    
 
+    await getAllEvents()
+    buildCalendarLayout()
 
-    const recentEvents = await fetchRecentEvents()
+    const recentEvents = getRecentEvents()
     if(recentEvents.length != 0) document.getElementById("events-carousel-empty").style.display = "none" 
     recentEvents.forEach((event) => {
-        let eventCard = createEventCard(event.title, event.text, event.event_time, event.category)
+        let eventCard = createEventCard(event.title, event.description, event.event_time, event.category)
         eventsCarousel.append(eventCard)
     })
 
-    buildCalendarLayout()
     let now = new Date()
     updateCalendar(now.getMonth(), now.getFullYear())
     console.log("Calendar script loaded")
