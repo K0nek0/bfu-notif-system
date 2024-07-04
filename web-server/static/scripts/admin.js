@@ -30,6 +30,7 @@ const renderTable = (list) => {
 
     const tr = document.createElement('tr');
     const thTitle = document.createElement('th');
+    const thCategory = document.createElement('th');
     const thDescription = document.createElement('th');
     const thDateTime = document.createElement('th');
     const thDelete = document.createElement('th');
@@ -37,12 +38,12 @@ const renderTable = (list) => {
     thTitle.innerHTML = item.title;
     thDescription.innerHTML = item.description || '';
     thDateTime.innerHTML = formatDate(item.event_time);
-    // thCategory.innerHTML = item.category;
+    thCategory.innerHTML = item.category;
     thDelete.append(iconBtn);
 
     tableBody.append(tr);
     tr.append(thTitle);
-    // tr.append(thCategory);
+    tr.append(thCategory);
     tr.append(thDateTime);
     tr.append(thDescription);
     tr.append(thDelete);
