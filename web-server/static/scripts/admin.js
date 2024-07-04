@@ -1,4 +1,4 @@
-let notificationList = []
+let notificationList = [];
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
@@ -11,6 +11,13 @@ const formatDate = (date) => {
 
   console.log(day);
   return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
+};
+
+// Объект для сопоставления tag и текстовых значений категорий
+const categoryMap = {
+  activity: 'Мероприятие',
+  study: 'Учёба',
+  important: 'Важное',
 };
 
 // Функция отрисовки списка
@@ -40,7 +47,7 @@ const renderTable = () => {
     thDescription.innerHTML = item.description || '';
     thDescription.classList.add('description');
     thDateTime.innerHTML = formatDate(item.event_time);
-    thCategory.innerHTML = item.category;
+    thCategory.innerHTML = categoryMap[item.tag] || 'Неизвестная категория';
     thDelete.append(iconBtn);
 
     tableBody.append(tr);
@@ -83,7 +90,7 @@ form.addEventListener('submit', async (e) => {
     title: title.value,
     description: description.value || '',
     event_time: datetime.value,
-    category: category.value,
+    tag: category.value,
   };
 
   await fetch(`/new_event`, {
@@ -112,13 +119,13 @@ form.addEventListener('submit', async (e) => {
   category.value = '';
 });
 
-const fetchEvents = async function() {
+const fetchEvents = async function () {
   notificationList = await fetch('/events')
       .then((res) => res.json())
       .then((res) => res);
 
   renderTable();
-}
+};
 
 // Запрос на список при входе на страницу
 document.addEventListener('DOMContentLoaded', async () => {
