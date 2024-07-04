@@ -77,7 +77,7 @@ form.addEventListener('submit', async (e) => {
   const title = form.querySelector('#title');
   const description = form.querySelector('#description');
   const datetime = form.querySelector('#datetime');
-  const category = form.querySelector('#category');
+  const category = form.querySelector('#category_id');
 
   const notification = {
     title: title.value,
