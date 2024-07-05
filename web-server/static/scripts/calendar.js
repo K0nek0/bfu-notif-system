@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async event => {
             cell.children.item(0).textContent = currentCellDate.getDate()
             
             let dayEvents = getEventsByDate(currentCellDate) 
-            cell.children.item(1).textContent = dayEvents.length
+            cell.children.item(1).textContent = (dayEvents.length == 0 ? "" : `${dayEvents.length}`)
             cell.setAttribute("data-datestr", currentCellDate.toISOString())
 
             currentCellDate.setTime(currentCellDate.getTime() + millisecondsInDay)
