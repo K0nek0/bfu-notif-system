@@ -42,6 +42,8 @@ def handle_socket_client(conn, addr):
                     handler.add_user_to_db(json_data)
                 elif 'delete' in json_data:
                     handler.delete_user_from_db(json_data)
+                elif 'get' in json_data:
+                    handler.get_all_events_from_db(conn)
                 buffer = b""
             except json.JSONDecodeError:
                 conn.sendall(b"Invalid JSON data")

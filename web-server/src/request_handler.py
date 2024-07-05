@@ -209,6 +209,17 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             print(f"Error when deleting a user from the database: {e}")
 
+    @staticmethod
+    def get_all_events_from_db(client):
+        try:
+            query = "SELECT * FROM events"
+            RequestHandler._database.cursor.execute(query)
+            events = RequestHandler._database.cursor.fetchall()
+            client.sendall(json.dumps(events).encode('utf-8'))
+        except Exception as e:
+            print(f"Error sending data to socket client: {e}")
+
+
     def notify_users_of_event(self, event_id):
         if RequestHandler._database:
             try:
