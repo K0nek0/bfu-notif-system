@@ -2,15 +2,15 @@ let notificationList = [];
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
-  const addZero2 = (str) => (str.length <= 2 ? '0' + str : str);
   const dateTime = new Date(date);
   const day = String(dateTime.getDate());
   const month = String(dateTime.getMonth() + 1);
   const year = String(dateTime.getFullYear());
-  const time = `${dateTime.getHours()}:${dateTime.getMinutes()}`;
+  const hours = String(dateTime.getHours());
+  const minutes = String(dateTime.getMinutes());
+  const time = `${addZero(hours)}:${addZero(minutes)}`;
 
-  console.log(day);
-  return `${addZero(day)}.${addZero(month)}.${year} ${addZero2(time)}`;
+  return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
 };
 
 // Объект для сопоставления category_id и текстовых значений
