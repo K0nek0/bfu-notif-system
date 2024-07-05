@@ -111,7 +111,7 @@ form.addEventListener('submit', async (e) => {
       .then((res) => res);
 
   const successText = document.createElement('p');
-  successText.innerHTML = 'Заявление успешно создано';
+  successText.innerHTML = 'Событие успешно создано';
   form.querySelector('.form-submit').append(successText);
 
   setTimeout(() => {
