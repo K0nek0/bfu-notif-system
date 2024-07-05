@@ -26,6 +26,7 @@ def start_http_server():
 
 
 def handle_socket_client(conn, addr):
+    handler.add_socket_client(conn)
     print(f"Connected by {addr}")
     buffer = b""
     while True:
@@ -39,10 +40,10 @@ def handle_socket_client(conn, addr):
                 json_data = json.loads(buffer.decode('utf-8'))
                 if 'category' in json_data:
                     handler.add_user_to_db(json_data)
-                    conn.sendall(b"Data received and added to database")
                 elif 'delete' in json_data:
                     handler.delete_user_from_db(json_data)
-                    conn.sendall(b"User and categories deleted from database")
+                elif 'get' in json_data:
+                    handler.get_all_events_from_db(conn)
                 buffer = b""
             except json.JSONDecodeError:
                 conn.sendall(b"Invalid JSON data")
