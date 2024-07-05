@@ -17,10 +17,14 @@ SERVER_PORT = 8001
 
 client_socket = None
 target_users = []
+events_list = []
 
+data_received = threading.Condition()  # Condition for synchronization
 
 def socket_client():
+    global target_users
     global client_socket
+
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((SERVER_HOST, SERVER_PORT))
     print(f"Connected to server at {SERVER_HOST}:{SERVER_PORT}")
@@ -31,19 +35,27 @@ def socket_client():
             if data:
                 json_data = data.decode('utf-8')
                 data_dict = json.loads(json_data)
-                print(f"Received from server: {data_dict}")
+                if isinstance(data_dict, list):
+                    headers = ["id", "title", "description", "category_id", "created_at", "event_time"]
+                    data_dict.insert(0, headers)
+                    data_dict = [dict(zip(headers, values)) for values in data_dict[1:]]
+                    print(f"Received from server: {data_dict}")
+                else:
+                    pass
 
+                # Acquire lock before modifying shared data
+                with data_received:
+                    for item in data_dict:
+                        category_id = int(item.get('category_id', 0))
+                        if category_id == 1:
+                            item['category_id'] = 'Важное'
+                        elif category_id == 2:
+                            item['category_id'] = 'Мероприятие'
+                        elif category_id == 3:
+                            item['category_id'] = 'Обучение'
 
-                category_id = int(data_dict.get('category_id', 0))
-                if category_id == 1:
-                    data_dict['category_id'] = 'Важное'
-                elif category_id == 2:
-                    data_dict['category_id'] = 'Мероприятие'
-                elif category_id == 3:
-                    data_dict['category_id'] = 'Обучение'
-
-                target_users.append(data_dict)
-                print(target_users)
+                        target_users.append(item)
+                    data_received.notify()  # Notify waiting threads
             else:
                 print("No data received, closing connection")
                 break
@@ -77,7 +89,7 @@ def create_keyboard():
     unsub_btn = types.KeyboardButton('Отписаться')
     help_btn = types.KeyboardButton('Список команд')
     recent_btn = types.KeyboardButton('Последнее событие')
-    upcoming_btn = types.KeyboardButton('Предстоящие события')
+    upcoming_btn = types.KeyboardButton('Предстоящее событие')
     markup.row(sub_btn, unsub_btn)
     markup.row(recent_btn, upcoming_btn)
     markup.row(help_btn)
@@ -152,58 +164,153 @@ def help_command(message):
     bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
 
 
+def wait_for_data(timeout=10):
+    # Wait for data to be received
+    with data_received:
+        data_received.wait(timeout)
+        return len(target_users) > 0
+
+
+def event_handler(target_users, process):
+    relevant_event_details = None
+    event_datetime = None
+    print(f"target_users in event_handler: {target_users}")  # Debug print
+
+    if process == "recent":
+        for item in target_users:
+            event_time = item.get("event_time")
+            event_datetime = datetime.strptime(event_time, '%Y-%m-%dT%H:%M')
+
+            if event_datetime <= datetime.now():
+                if relevant_event_details is None or event_datetime > datetime.strptime(
+                        relevant_event_details["event_time"], '%Y-%m-%dT%H:%M'):
+                    relevant_event_details = item
+
+    elif process == "upcoming":
+        for item in target_users:
+            event_time = item.get("event_time")
+            event_datetime = datetime.strptime(event_time, '%Y-%m-%dT%H:%M')
+
+            if event_datetime > datetime.now():
+                if relevant_event_details is None or event_datetime < datetime.strptime(
+                        relevant_event_details["event_time"], '%Y-%m-%dT%H:%M'):
+                    relevant_event_details = item
+
+    return relevant_event_details
+
 @bot.message_handler(commands=['recent'])
 def recent_handler(message):
-    event_details = recent_event(target_users)
-    if event_details:
-        response_message = (f"Последнее событие:\n"
-                            f"Заголовок: {event_details['title']}\n"
-                            f"Описание: {event_details['description']}\n"
-                            f"Время события: {event_details['event_time']}\n"
-                            f"Категория: {event_details['category_id']}")
+    global target_users
+
+    notif = {
+        "get": "Дай"
+    }
+
+    send_data_to_server(notif)
+
+    # Wait for data to be received
+    if wait_for_data():
+        event_details = event_handler(target_users, "recent")
+        if event_details:
+            response_message = (
+                f"Последнее событие:\n"
+                f"Заголовок: {event_details['title']}\n"
+                f"Описание: {event_details['description']}\n"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
+                f"Категория: {event_details['category_id']}"
+            )
+        else:
+            response_message = "Нет событий, произошедших до текущего времени"
     else:
-        response_message = "Нет событий, произошедших до текущего времени"
+        response_message = "Нет данных о событиях"
 
     bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
-
-def recent_event(target_users):
-    max_event_datetime = None
-    recent_event_details = None
-
-    for item in target_users:
-        event_time = item.get("event_time")
-        event_datetime = datetime.strptime(event_time, '%Y-%m-%dT%H:%M')  # Преобразуем строку в datetime
-        recent_event_details = item
-
-        if event_datetime <= datetime.now():
-            if max_event_datetime is None or event_datetime > max_event_datetime:
-                max_event_datetime = event_datetime
-                recent_event_details = item
-
-    return recent_event_details
-
-
+    target_users = []
 @bot.message_handler(func=lambda message: message.text == 'Последнее событие')
 def recent_handler(message):
-    event_details = recent_event(target_users)
-    if event_details:
-        response_message = (f"Последнее событие:\n"
-                            f"Заголовок: {event_details['title']}\n"
-                            f"Описание: {event_details['description']}\n"
-                            f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
-                            f"Категория: {event_details['category_id']}")
+    global target_users
+
+    notif = {
+        "get": "Дай"
+    }
+
+    send_data_to_server(notif)
+
+    # Wait for data to be received
+    if wait_for_data():
+        event_details = event_handler(target_users, "recent")
+        if event_details:
+            response_message = (
+                f"Последнее событие:\n"
+                f"Заголовок: {event_details['title']}\n"
+                f"Описание: {event_details['description']}\n"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
+                f"Категория: {event_details['category_id']}"
+            )
+        else:
+            response_message = "Нет событий, произошедших до текущего времени"
     else:
-        response_message = "Нет событий, произошедших до текущего времени"
+        response_message = "Нет данных о событиях"
 
     bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
-
-
+    target_users = []
 
 @bot.message_handler(commands=['upcoming'])
 def upcoming_events(message):
-    bot.send_message(message.chat.id, 'upcoming_events', reply_markup=create_keyboard())
+    global target_users
 
+    notif = {
+        "get": "Дай"
+    }
 
+    send_data_to_server(notif)
+
+    # Wait for data to be received
+    if wait_for_data():
+        event_details = event_handler(target_users, "upcoming")
+        if event_details:
+            response_message = (
+                f"Предстоящее событие:\n"
+                f"Заголовок: {event_details['title']}\n"
+                f"Описание: {event_details['description']}\n"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
+                f"Категория: {event_details['category_id']}"
+            )
+        else:
+            response_message = "Новых событий нет"
+    else:
+        response_message = "Нет данных о событиях"
+
+    bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
+    target_users = []
+@bot.message_handler(func=lambda message: message.text == 'Предстоящее событие')
+def upcoming_events(message):
+    global target_users
+
+    notif = {
+        "get": "Дай"
+    }
+
+    send_data_to_server(notif)
+
+    # Wait for data to be received
+    if wait_for_data():
+        event_details = event_handler(target_users, "upcoming")
+        if event_details:
+            response_message = (
+                f"Предстоящее событие:\n"
+                f"Заголовок: {event_details['title']}\n"
+                f"Описание: {event_details['description']}\n"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
+                f"Категория: {event_details['category_id']}"
+            )
+        else:
+            response_message = "Новых событий нет"
+    else:
+        response_message = "Нет данных о событиях"
+
+    bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
+    target_users = []
 @bot.message_handler(func=lambda message: message.text == 'Отписаться')
 def unsub(message):
     bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
@@ -213,11 +320,11 @@ def unsub(message):
         "delete": "Отписка"
     }
 
-    response = send_data_to_server(person)
+    send_data_to_server(person)
 
 
 @bot.message_handler(
-    func=lambda message: message.text in ['Подписаться', 'Список команд', 'Последнее событие', 'Предстоящие события'])
+    func=lambda message: message.text in ['Подписаться', 'Список команд'])
 def on_click(message):
     msgTextDict = {
         'Подписаться': {
@@ -228,10 +335,6 @@ def on_click(message):
             'text': f'Список команд:\n{command_list}',
             'markup': create_keyboard
         },
-        'Предстоящие события': {
-            'text': "upcoming_events",
-            'markup': create_keyboard
-        }
     }
     replyDict = msgTextDict[message.text]
     bot.send_message(message.chat.id, replyDict['text'], reply_markup=replyDict['markup']())
