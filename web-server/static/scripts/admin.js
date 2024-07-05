@@ -10,7 +10,7 @@ const formatDate = (date) => {
   const time = `${dateTime.getHours()}:${dateTime.getMinutes()}`;
 
   console.log(day);
-  return `${addZero(day)}.${addZero(month)}.${year} ${time}`;
+  return `${addZero(day)}.${addZero(month)}.${year} ${addZero(time)}`;
 };
 
 // Объект для сопоставления category_id и текстовых значений
