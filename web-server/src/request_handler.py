@@ -236,20 +236,18 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 RequestHandler._database.cursor.execute(query_event, (event_id,))
                 event_data = RequestHandler._database.cursor.fetchone()
 
-                for user in users:
-                    user_id = user[0]
-                    self.send_data_to_socket_clients(user_id, event_data)
+                self.send_data_to_socket_clients(users, event_data)
 
             except Exception as e:
                 print(f"Error notifying users of event: {e}")
         else:
             print("Database not connected")
 
-    def send_data_to_socket_clients(self, user_id, event_data):
+    def send_data_to_socket_clients(self, users, event_data):
         for client in RequestHandler._socket_clients:
             try:
                 notification = {
-                    "user_id": user_id,
+                    "users_id": users,
                     "title": event_data[1],
                     "description": event_data[2],
                     "category_id": event_data[3],
