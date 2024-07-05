@@ -374,7 +374,8 @@ document.addEventListener("DOMContentLoaded", async event => {
                 toBind.forEach((bindCell) => {
                     bindCell.addEventListener("click", () => {
                         if(bindCell.classList.contains("inactive")) return
-                        showDateDetails(bindCell, details)
+                        if(details.hasAttribute("data-showing") && details.getAttribute("data-showing") == bindCell.getAttribute("data-datestr")) hideDateDetails(details, false)
+                        else showDateDetails(bindCell, details)
                     })
                 })
                 calendar.append(details)
