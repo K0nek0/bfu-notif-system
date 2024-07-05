@@ -2,7 +2,7 @@ let notificationList = [];
 // Функция форматирования даты
 const formatDate = (date) => {
   const addZero = (str) => (str.length <= 1 ? '0' + str : str);
-
+  const addZero2 = (str) => (str.length <= 2 ? '0' + str : str);
   const dateTime = new Date(date);
   const day = String(dateTime.getDate());
   const month = String(dateTime.getMonth() + 1);
@@ -10,7 +10,7 @@ const formatDate = (date) => {
   const time = `${dateTime.getHours()}:${dateTime.getMinutes()}`;
 
   console.log(day);
-  return `${addZero(day)}.${addZero(month)}.${year} ${addZero(time)}`;
+  return `${addZero(day)}.${addZero(month)}.${year} ${addZero2(time)}`;
 };
 
 // Объект для сопоставления category_id и текстовых значений
