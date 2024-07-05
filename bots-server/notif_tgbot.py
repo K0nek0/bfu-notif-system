@@ -18,13 +18,15 @@ SERVER_PORT = 8001
 client_socket = None
 target_users = []
 events_list = []
+notif_user = {}
 
-data_received = threading.Condition()  # Condition for synchronization
+data_received = threading.Condition()
+
 
 def socket_client():
     global target_users
     global client_socket
-
+    global notif_user
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((SERVER_HOST, SERVER_PORT))
     print(f"Connected to server at {SERVER_HOST}:{SERVER_PORT}")
@@ -35,33 +37,48 @@ def socket_client():
             if data:
                 json_data = data.decode('utf-8')
                 data_dict = json.loads(json_data)
+                notif_value = json.loads(json_data)
+
                 if isinstance(data_dict, list):
+
                     headers = ["id", "title", "description", "category_id", "created_at", "event_time"]
                     data_dict.insert(0, headers)
                     data_dict = [dict(zip(headers, values)) for values in data_dict[1:]]
-                    print(f"Received from server: {data_dict}")
-                else:
-                    pass
 
-                # Acquire lock before modifying shared data
-                with data_received:
-                    for item in data_dict:
-                        category_id = int(item.get('category_id', 0))
-                        if category_id == 1:
-                            item['category_id'] = 'Важное'
-                        elif category_id == 2:
-                            item['category_id'] = 'Мероприятие'
-                        elif category_id == 3:
-                            item['category_id'] = 'Обучение'
+                if isinstance(data_dict, dict):
+                    category_id = int(notif_value.get('category_id', 0))
+                    if category_id == 1:
+                        notif_value['category_id'] = 'Важное'
+                    elif category_id == 2:
+                        notif_value['category_id'] = 'Мероприятие'
+                    elif category_id == 3:
+                        notif_value['category_id'] = 'Обучение'
 
-                        target_users.append(item)
-                    data_received.notify()  # Notify waiting threads
+                    notif_user = notif_value
+                    send_notif(notif_user)
+
+                target_users = data_dict
+
             else:
                 print("No data received, closing connection")
                 break
         except Exception as e:
             print(f"Error receiving data: {e}")
             break
+
+
+def send_notif(notif_user):
+    users_id = notif_user.get("users_id")
+    desc = notif_user.get("description")
+    title = notif_user.get("title")
+    event_time = notif_user.get("event_time")
+
+    for user_id in users_id:
+        notif_message = (
+            f"*{title}* ({event_time.replace('T', ' ')})\n"
+            f"{desc}\n"
+        )
+        bot.send_message(int(user_id[0]), notif_message, parse_mode='Markdown', reply_markup=create_keyboard())
 
 
 def send_data_to_server(data):
@@ -164,8 +181,8 @@ def help_command(message):
     bot.send_message(message.chat.id, f'Список команд:\n{command_list}', reply_markup=create_keyboard())
 
 
-def wait_for_data(timeout=10):
-    # Wait for data to be received
+def wait_for_data(timeout=1):
+
     with data_received:
         data_received.wait(timeout)
         return len(target_users) > 0
@@ -174,7 +191,7 @@ def wait_for_data(timeout=10):
 def event_handler(target_users, process):
     relevant_event_details = None
     event_datetime = None
-    print(f"target_users in event_handler: {target_users}")  # Debug print
+    print(f"target_users in event_handler: {target_users}")
 
     if process == "recent":
         for item in target_users:
@@ -198,6 +215,7 @@ def event_handler(target_users, process):
 
     return relevant_event_details
 
+
 @bot.message_handler(commands=['recent'])
 def recent_handler(message):
     global target_users
@@ -208,7 +226,7 @@ def recent_handler(message):
 
     send_data_to_server(notif)
 
-    # Wait for data to be received
+
     if wait_for_data():
         event_details = event_handler(target_users, "recent")
         if event_details:
@@ -216,8 +234,7 @@ def recent_handler(message):
                 f"Последнее событие:\n"
                 f"Заголовок: {event_details['title']}\n"
                 f"Описание: {event_details['description']}\n"
-                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
-                f"Категория: {event_details['category_id']}"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}"
             )
         else:
             response_message = "Нет событий, произошедших до текущего времени"
@@ -226,34 +243,7 @@ def recent_handler(message):
 
     bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
     target_users = []
-@bot.message_handler(func=lambda message: message.text == 'Последнее событие')
-def recent_handler(message):
-    global target_users
 
-    notif = {
-        "get": "Дай"
-    }
-
-    send_data_to_server(notif)
-
-    # Wait for data to be received
-    if wait_for_data():
-        event_details = event_handler(target_users, "recent")
-        if event_details:
-            response_message = (
-                f"Последнее событие:\n"
-                f"Заголовок: {event_details['title']}\n"
-                f"Описание: {event_details['description']}\n"
-                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
-                f"Категория: {event_details['category_id']}"
-            )
-        else:
-            response_message = "Нет событий, произошедших до текущего времени"
-    else:
-        response_message = "Нет данных о событиях"
-
-    bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
-    target_users = []
 
 @bot.message_handler(commands=['upcoming'])
 def upcoming_events(message):
@@ -265,7 +255,7 @@ def upcoming_events(message):
 
     send_data_to_server(notif)
 
-    # Wait for data to be received
+
     if wait_for_data():
         event_details = event_handler(target_users, "upcoming")
         if event_details:
@@ -273,8 +263,7 @@ def upcoming_events(message):
                 f"Предстоящее событие:\n"
                 f"Заголовок: {event_details['title']}\n"
                 f"Описание: {event_details['description']}\n"
-                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
-                f"Категория: {event_details['category_id']}"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}"
             )
         else:
             response_message = "Новых событий нет"
@@ -283,6 +272,37 @@ def upcoming_events(message):
 
     bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
     target_users = []
+
+
+@bot.message_handler(func=lambda message: message.text == 'Последнее событие')
+def recent_handler(message):
+    global target_users
+
+    notif = {
+        "get": "Дай"
+    }
+
+    send_data_to_server(notif)
+
+
+    if wait_for_data():
+        event_details = event_handler(target_users, "recent")
+        if event_details:
+            response_message = (
+                f"Последнее событие:\n"
+                f"Заголовок: {event_details['title']}\n"
+                f"Описание: {event_details['description']}\n"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}"
+            )
+        else:
+            response_message = "Нет событий, произошедших до текущего времени"
+    else:
+        response_message = "Нет данных о событиях"
+
+    bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
+    target_users = []
+
+
 @bot.message_handler(func=lambda message: message.text == 'Предстоящее событие')
 def upcoming_events(message):
     global target_users
@@ -293,7 +313,7 @@ def upcoming_events(message):
 
     send_data_to_server(notif)
 
-    # Wait for data to be received
+
     if wait_for_data():
         event_details = event_handler(target_users, "upcoming")
         if event_details:
@@ -301,8 +321,7 @@ def upcoming_events(message):
                 f"Предстоящее событие:\n"
                 f"Заголовок: {event_details['title']}\n"
                 f"Описание: {event_details['description']}\n"
-                f"Время события: {event_details['event_time'].replace('T', ' ')}\n"
-                f"Категория: {event_details['category_id']}"
+                f"Время события: {event_details['event_time'].replace('T', ' ')}"
             )
         else:
             response_message = "Новых событий нет"
@@ -311,6 +330,8 @@ def upcoming_events(message):
 
     bot.send_message(message.chat.id, response_message, reply_markup=create_keyboard())
     target_users = []
+
+
 @bot.message_handler(func=lambda message: message.text == 'Отписаться')
 def unsub(message):
     bot.send_message(message.chat.id, 'Вы успешно отписались от рассылки!', reply_markup=create_keyboard())
